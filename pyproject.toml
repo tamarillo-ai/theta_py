@@ -1,6 +1,6 @@
 [project]
 name = "theta-py"
-version = "0.0.2"
+version = "0.0.3"
 description = "Python bindings for the theta CLI"
 readme = "README.md"
 requires-python = ">=3.12"
