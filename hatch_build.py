@@ -8,21 +8,43 @@ from hatchling.builders.hooks.plugin.interface import BuildHookInterface
 
 
 def _host_platform_tag() -> str:
+    """The PEP 425 platform tag we stamp into the wheel filename.
+
+    PyPI rejects bare `linux_*` tags. Wheels MUST carry a `manylinux_*` (or
+    `musllinux_*`) tag on Linux, `macosx_X_Y_*` on macOS, and `win_*` on
+    Windows. We compute the right value per platform; CI can override with
+    `THETA_PY_PLATFORM_TAG` when cross-building.
+    """
     override = os.environ.get("THETA_PY_PLATFORM_TAG")
     if override:
         return override
 
     from packaging.tags import sys_tags
 
-    tag = next(t for t in sys_tags() if "manylinux" not in t.platform and "musllinux" not in t.platform)
-    platform_str = tag.platform
+    if sys.platform == "linux":
+        # prefer the lowest manylinux floor we can match. PyPI accepts
+        # `manylinux_2_X_<arch>`; `manylinux2014_<arch>` (the legacy alias)
+        # is equivalent to `manylinux_2_17_<arch>`. CI sets the runner image
+        # so this just reflects what the runner provides.
+        for tag in sys_tags():
+            if tag.platform.startswith("manylinux"):
+                return tag.platform
+        msg = (
+            "no manylinux tag available on this host; cannot build a "
+            "PyPI-acceptable Linux wheel. Override with "
+            "THETA_PY_PLATFORM_TAG (e.g. manylinux_2_28_x86_64)."
+        )
+        raise RuntimeError(msg)
 
     if sys.platform == "darwin":
         from hatchling.builders.macos import process_macos_plat_tag
 
-        platform_str = process_macos_plat_tag(platform_str, compat=False)
+        tag = next(t for t in sys_tags() if t.platform.startswith("macosx"))
+        return process_macos_plat_tag(tag.platform, compat=False)
 
-    return platform_str
+    # Windows: just pick the first concrete tag, which is `win_amd64`
+    # (or `win_arm64`).
+    return next(t for t in sys_tags() if t.platform.startswith("win")).platform
 
 
 class ThetaPyBuildHook(BuildHookInterface):
