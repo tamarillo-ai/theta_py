@@ -37,7 +37,7 @@ jobs:
       theta_version: ${{ steps.theta.outputs.version }}
       is_prerelease: ${{ steps.classify.outputs.is_prerelease }}
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           persist-credentials: false
       - uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
@@ -80,9 +80,9 @@ jobs:
           - target: aarch64-apple-darwin
             os: macos-15
           - target: x86_64-pc-windows-msvc
-            os: windows-2025
+            os: windows-latest
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           persist-credentials: false
 
@@ -105,9 +105,6 @@ jobs:
         env:
           THETA_PY_REQUIRE_BINARY: "1"
           MACOSX_DEPLOYMENT_TARGET: "11.0"
-          # macos-15 runners are arm64. For x86_64-apple-darwin we're cross-
-          # building (bundled binary is x86_64, host is arm64), so pin the
-          # platform segment explicitly. Same env contract as ci.yml.
           THETA_PY_PLATFORM_TAG: ${{ matrix.target == 'x86_64-apple-darwin' && 'macosx_11_0_x86_64' || '' }}
         run: uv build --wheel
 
@@ -131,7 +128,7 @@ jobs:
           print("OK")
           PY
 
-      - uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: wheel-${{ matrix.target }}
           path: dist/*.whl
@@ -143,7 +140,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           pattern: wheel-*
           merge-multiple: true
@@ -159,7 +156,7 @@ jobs:
             echo "::error::expected 5 wheels, got $count" >&2
             exit 1
           fi
-      - uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: wheels-all
           path: dist/*.whl
@@ -176,7 +173,7 @@ jobs:
     permissions:
       id-token: write
     steps:
-      - uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: wheels-all
           path: dist
@@ -199,7 +196,7 @@ jobs:
     permissions:
       id-token: write
     steps:
-      - uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: wheels-all
           path: dist
