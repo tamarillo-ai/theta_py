@@ -1,0 +1,19 @@
+pre-commit:
+  parallel: true
+  commands:
+    ruff-check:
+      glob: "*.py"
+      stage_fixed: true
+      run: uv run ruff check --fix {staged_files}
+    ruff-format:
+      glob: "*.py"
+      stage_fixed: true
+      run: uv run ruff format {staged_files}
+
+pre-push:
+  parallel: true
+  commands:
+    ty:
+      run: uv run ty check src
+    pytest-fast:
+      run: uv run pytest -q -m "not network"

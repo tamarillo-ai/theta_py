@@ -1,0 +1,114 @@
+name: sync-theta
+
+on:
+  repository_dispatch:
+    types: [theta-release]
+  workflow_dispatch:
+    inputs:
+      theta_version:
+        description: "theta release tag (without leading v) to sync to"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.client_payload.theta_version || inputs.theta_version }}
+  cancel-in-progress: false
+
+env:
+  NEW_THETA_VERSION: ${{ github.event.client_payload.theta_version || inputs.theta_version }}
+
+jobs:
+  open-pr:
+    name: "open bump PR"
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: true
+
+      - uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
+        with:
+          enable-cache: true
+          python-version: "3.13"
+
+      - run: uv sync
+
+      - name: "setup theta binary (linux x86_64)"
+        id: theta_bin
+        uses: ./.github/actions/setup-theta
+        with:
+          theta_version: ${{ env.NEW_THETA_VERSION }}
+          target: x86_64-unknown-linux-gnu
+
+      - name: "regenerate codegen"
+        run: |
+          uv run python -m theta_py._codegen \
+            --binary ${{ steps.theta_bin.outputs.binary_path }} \
+            --theta-version "${NEW_THETA_VERSION}"
+
+      - name: "bump theta_py patch version"
+        id: bump
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Use tomlkit so comments / whitespace / key order survive the
+          # write back. tomlkit is preferred over tomli-w because it does
+          # round-trip preservation.
+          versions=$(uv run --with tomlkit python - <<'PY'
+          import sys
+          from pathlib import Path
+          import tomlkit
+
+          path = Path("pyproject.toml")
+          doc = tomlkit.parse(path.read_text())
+          current = doc["project"]["version"]
+          major, minor, patch = (int(x) for x in str(current).split("."))
+          new = f"{major}.{minor}.{patch + 1}"
+          doc["project"]["version"] = new
+          path.write_text(tomlkit.dumps(doc))
+          # Single line, easy to split in bash.
+          sys.stdout.write(f"{current} {new}")
+          PY
+          )
+          read -r current new <<< "$versions"
+          echo "current=${current}" >> "$GITHUB_OUTPUT"
+          echo "new=${new}" >> "$GITHUB_OUTPUT"
+          echo "bumped theta_py: ${current} → ${new}"
+
+      - name: "open PR"
+        uses: peter-evans/create-pull-request@5e914681df9dc83aa4e4905692ca88beb2f9e91f # v7.0.5
+        with:
+          add-paths: |
+            src/theta_py/_generated/**
+            src/theta_py/_version.py
+            tests/_generated/**
+            pyproject.toml
+          branch: sync-theta/${{ env.NEW_THETA_VERSION }}
+          delete-branch: true
+          base: main
+          title: "sync: theta v${{ env.NEW_THETA_VERSION }} (theta_py ${{ steps.bump.outputs.current }} → ${{ steps.bump.outputs.new }})"
+          commit-message: |
+            sync: theta v${{ env.NEW_THETA_VERSION }}
+
+            - regenerated codegen against theta v${{ env.NEW_THETA_VERSION }}
+            - bumped theta_py ${{ steps.bump.outputs.current }} → ${{ steps.bump.outputs.new }}
+          body: |
+            Automated bump triggered by theta v${{ env.NEW_THETA_VERSION }} release.
+
+            **theta_py version:** `${{ steps.bump.outputs.current }}` → `${{ steps.bump.outputs.new }}`
+            **bundled theta:** `${{ env.NEW_THETA_VERSION }}`
+
+            Once `ci.yml` is green and this PR is reviewed:
+            1. Merge to `main`
+            2. Tag the merge commit: `git tag v${{ steps.bump.outputs.new }} && git push --tags`
+            3. `release.yml` will build 5 platform wheels and publish to PyPI
+
+            For a pre-release dress rehearsal, tag `v${{ steps.bump.outputs.new }}-rc1` instead — that stops at TestPyPI.
+          labels: |
+            automated
+            theta-sync

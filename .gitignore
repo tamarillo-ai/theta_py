@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+.ty_cache/
+dist/
+build/
+*.egg-info/
+
+# bundled theta binary — downloaded at build time from a theta release,
+# NEVER committed. The release workflow stages it before wheel build;
+# locally, scratch/theta-py-release-dry-run.fish does the same.
+src/theta_py/_bin/
+
+# raw pydantic schemas the generator dumps temporarily
+schemas/
