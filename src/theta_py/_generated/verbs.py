@@ -40,36 +40,36 @@ class Add:
         env: Mapping[str, str] | None = None,
     ) -> outcomes.MutationOutput:
         """Scaffold and register a new rule"""
-        argv: list[str] = ["add", "rule"]
+        argv: list[str] = ['add', 'rule']
         argv.append(name)
         if system is not None:
-            argv.extend(["--system", system])
+            argv.extend(['--system', system])
         if path is not None:
-            argv.extend(["--path", path])
+            argv.extend(['--path', path])
         if git is not None:
-            argv.extend(["--git", git])
+            argv.extend(['--git', git])
         if branch is not None:
-            argv.extend(["--branch", branch])
+            argv.extend(['--branch', branch])
         if tag is not None:
-            argv.extend(["--tag", tag])
+            argv.extend(['--tag', tag])
         if rev is not None:
-            argv.extend(["--rev", rev])
+            argv.extend(['--rev', rev])
         if file is not None:
-            argv.extend(["--file", file])
+            argv.extend(['--file', file])
         if sync:
-            argv.append("--sync")
+            argv.append('--sync')
         if content is not None:
-            argv.extend(["--content", content])
+            argv.extend(['--content', content])
         if summary is not None:
-            argv.extend(["--summary", summary])
+            argv.extend(['--summary', summary])
         if apply is not None:
-            argv.extend(["--apply", apply])
+            argv.extend(['--apply', apply])
         if apply_to is not None:
-            argv.extend(["--apply-to", apply_to])
+            argv.extend(['--apply-to', apply_to])
         if description is not None:
-            argv.extend(["--description", description])
+            argv.extend(['--description', description])
         envelope = self._theta._run(argv, cwd=cwd, env=env)
-        return outcomes.MutationOutput.model_validate(envelope["data"])
+        return outcomes.MutationOutput.model_validate(envelope['data'])
 
     def system(
         self,
@@ -80,13 +80,13 @@ class Add:
         env: Mapping[str, str] | None = None,
     ) -> outcomes.MutationOutput:
         """Scaffold and register the system prompt"""
-        argv: list[str] = ["add", "system"]
+        argv: list[str] = ['add', 'system']
         if path is not None:
-            argv.extend(["--path", path])
+            argv.extend(['--path', path])
         if content is not None:
-            argv.extend(["--content", content])
+            argv.extend(['--content', content])
         envelope = self._theta._run(argv, cwd=cwd, env=env)
-        return outcomes.MutationOutput.model_validate(envelope["data"])
+        return outcomes.MutationOutput.model_validate(envelope['data'])
 
     def tool(
         self,
@@ -104,26 +104,26 @@ class Add:
         env: Mapping[str, str] | None = None,
     ) -> outcomes.MutationOutput:
         """Register an MCP tool (stdio or HTTP)"""
-        argv: list[str] = ["add", "tool"]
+        argv: list[str] = ['add', 'tool']
         argv.append(name)
         if command is not None:
-            argv.extend(["--command", command])
+            argv.extend(['--command', command])
         if url is not None:
-            argv.extend(["--url", url])
+            argv.extend(['--url', url])
         if envs is not None:
-            argv.extend(["--env", envs])
+            argv.extend(['--env', envs])
         if headers is not None:
-            argv.extend(["--header", headers])
+            argv.extend(['--header', headers])
         if extra_args is not None:
-            argv.extend(["--args", extra_args])
+            argv.extend(['--args', extra_args])
         if disabled:
-            argv.append("--disabled")
+            argv.append('--disabled')
         if registry is not None:
-            argv.extend(["--registry", registry])
+            argv.extend(['--registry', registry])
         if no_cache:
-            argv.append("--no-cache")
+            argv.append('--no-cache')
         envelope = self._theta._run(argv, cwd=cwd, env=env)
-        return outcomes.MutationOutput.model_validate(envelope["data"])
+        return outcomes.MutationOutput.model_validate(envelope['data'])
 
     def skill(
         self,
@@ -145,34 +145,34 @@ class Add:
         env: Mapping[str, str] | None = None,
     ) -> outcomes.MutationOutput:
         """Scaffold or register a skill"""
-        argv: list[str] = ["add", "skill"]
+        argv: list[str] = ['add', 'skill']
         argv.append(name_or_ref)
         if name is not None:
-            argv.extend(["--name", name])
+            argv.extend(['--name', name])
         if path is not None:
-            argv.extend(["--path", path])
+            argv.extend(['--path', path])
         if git is not None:
-            argv.extend(["--git", git])
+            argv.extend(['--git', git])
         if branch is not None:
-            argv.extend(["--branch", branch])
+            argv.extend(['--branch', branch])
         if tag is not None:
-            argv.extend(["--tag", tag])
+            argv.extend(['--tag', tag])
         if rev is not None:
-            argv.extend(["--rev", rev])
+            argv.extend(['--rev', rev])
         if subdirectory is not None:
-            argv.extend(["--subdirectory", subdirectory])
+            argv.extend(['--subdirectory', subdirectory])
         if description is not None:
-            argv.extend(["--description", description])
+            argv.extend(['--description', description])
         if tags is not None:
-            argv.extend(["--tags", tags])
+            argv.extend(['--tags', tags])
         if goal is not None:
-            argv.extend(["--goal", goal])
+            argv.extend(['--goal', goal])
         if system:
-            argv.append("--system")
+            argv.append('--system')
         if no_sync:
-            argv.append("--no-sync")
+            argv.append('--no-sync')
         envelope = self._theta._run(argv, cwd=cwd, env=env)
-        return outcomes.MutationOutput.model_validate(envelope["data"])
+        return outcomes.MutationOutput.model_validate(envelope['data'])
 
     def subagent(
         self,
@@ -189,24 +189,24 @@ class Add:
         env: Mapping[str, str] | None = None,
     ) -> outcomes.MutationOutput:
         """Register a subagent (inline or ref)"""
-        argv: list[str] = ["add", "subagent"]
+        argv: list[str] = ['add', 'subagent']
         argv.append(name)
         if agent_ref is not None:
-            argv.extend(["--agent-ref", agent_ref])
+            argv.extend(['--agent-ref', agent_ref])
         if description is not None:
-            argv.extend(["--description", description])
+            argv.extend(['--description', description])
         if model is not None:
-            argv.extend(["--model", model])
+            argv.extend(['--model', model])
         if prompt_path is not None:
-            argv.extend(["--prompt-path", prompt_path])
+            argv.extend(['--prompt-path', prompt_path])
         if tools is not None:
-            argv.extend(["--tools", tools])
+            argv.extend(['--tools', tools])
         if skills is not None:
-            argv.extend(["--skills", skills])
+            argv.extend(['--skills', skills])
         if description_only:
-            argv.append("--description-only")
+            argv.append('--description-only')
         envelope = self._theta._run(argv, cwd=cwd, env=env)
-        return outcomes.MutationOutput.model_validate(envelope["data"])
+        return outcomes.MutationOutput.model_validate(envelope['data'])
 
 
 class Cast:
@@ -226,16 +226,16 @@ class Cast:
         env: Mapping[str, str] | None = None,
     ) -> outcomes.CastToOutcome:
         """Cast theta.toml to a harness-native config"""
-        argv: list[str] = ["cast", "to"]
+        argv: list[str] = ['cast', 'to']
         argv.append(target)
         if output is not None:
-            argv.extend(["--output", output])
+            argv.extend(['--output', output])
         if force:
-            argv.append("--force")
+            argv.append('--force')
         if notes:
-            argv.append("--notes")
+            argv.append('--notes')
         envelope = self._theta._run(argv, cwd=cwd, env=env)
-        return outcomes.CastToOutcome.model_validate(envelope["data"])
+        return outcomes.CastToOutcome.model_validate(envelope['data'])
 
     def from_(
         self,
@@ -251,22 +251,22 @@ class Cast:
         env: Mapping[str, str] | None = None,
     ) -> outcomes.CastFromOutcome:
         """Import a harness-native config into theta.toml"""
-        argv: list[str] = ["cast", "from"]
+        argv: list[str] = ['cast', 'from']
         argv.append(source)
         if input is not None:
-            argv.extend(["--input", input])
+            argv.extend(['--input', input])
         if force:
-            argv.append("--force")
+            argv.append('--force')
         if subagent_prompts is not None:
-            argv.extend(["--subagent-prompts", subagent_prompts])
+            argv.extend(['--subagent-prompts', subagent_prompts])
         if force_overwrite:
-            argv.append("--force-overwrite")
+            argv.append('--force-overwrite')
         if notes:
-            argv.append("--notes")
+            argv.append('--notes')
         if cross_read:
-            argv.append("--cross-read")
+            argv.append('--cross-read')
         envelope = self._theta._run(argv, cwd=cwd, env=env)
-        return outcomes.CastFromOutcome.model_validate(envelope["data"])
+        return outcomes.CastFromOutcome.model_validate(envelope['data'])
 
 
 class List:
@@ -281,9 +281,9 @@ class List:
         env: Mapping[str, str] | None = None,
     ) -> outcomes.ListOutcome:
         """List registered rules"""
-        argv: list[str] = ["list", "rules"]
+        argv: list[str] = ['list', 'rules']
         envelope = self._theta._run(argv, cwd=cwd, env=env)
-        return outcomes.ListOutcome.model_validate(envelope["data"])
+        return outcomes.ListOutcome.model_validate(envelope['data'])
 
     def tools(
         self,
@@ -291,9 +291,9 @@ class List:
         env: Mapping[str, str] | None = None,
     ) -> outcomes.ListOutcome:
         """List registered tools (MCP servers)"""
-        argv: list[str] = ["list", "tools"]
+        argv: list[str] = ['list', 'tools']
         envelope = self._theta._run(argv, cwd=cwd, env=env)
-        return outcomes.ListOutcome.model_validate(envelope["data"])
+        return outcomes.ListOutcome.model_validate(envelope['data'])
 
     def skills(
         self,
@@ -301,9 +301,9 @@ class List:
         env: Mapping[str, str] | None = None,
     ) -> outcomes.ListOutcome:
         """List registered skills"""
-        argv: list[str] = ["list", "skills"]
+        argv: list[str] = ['list', 'skills']
         envelope = self._theta._run(argv, cwd=cwd, env=env)
-        return outcomes.ListOutcome.model_validate(envelope["data"])
+        return outcomes.ListOutcome.model_validate(envelope['data'])
 
     def subagents(
         self,
@@ -311,9 +311,9 @@ class List:
         env: Mapping[str, str] | None = None,
     ) -> outcomes.ListOutcome:
         """List registered subagents"""
-        argv: list[str] = ["list", "subagents"]
+        argv: list[str] = ['list', 'subagents']
         envelope = self._theta._run(argv, cwd=cwd, env=env)
-        return outcomes.ListOutcome.model_validate(envelope["data"])
+        return outcomes.ListOutcome.model_validate(envelope['data'])
 
     def store(
         self,
@@ -321,9 +321,9 @@ class List:
         env: Mapping[str, str] | None = None,
     ) -> outcomes.ListOutcome:
         """List contents of the system store"""
-        argv: list[str] = ["list", "store"]
+        argv: list[str] = ['list', 'store']
         envelope = self._theta._run(argv, cwd=cwd, env=env)
-        return outcomes.ListOutcome.model_validate(envelope["data"])
+        return outcomes.ListOutcome.model_validate(envelope['data'])
 
 
 class Register:
@@ -349,28 +349,28 @@ class Register:
         env: Mapping[str, str] | None = None,
     ) -> outcomes.MutationOutput:
         """Register a skill into the system store"""
-        argv: list[str] = ["register", "skill"]
+        argv: list[str] = ['register', 'skill']
         argv.append(name_or_ref)
         if name is not None:
-            argv.extend(["--name", name])
+            argv.extend(['--name', name])
         if path is not None:
-            argv.extend(["--path", path])
+            argv.extend(['--path', path])
         if git is not None:
-            argv.extend(["--git", git])
+            argv.extend(['--git', git])
         if branch is not None:
-            argv.extend(["--branch", branch])
+            argv.extend(['--branch', branch])
         if tag is not None:
-            argv.extend(["--tag", tag])
+            argv.extend(['--tag', tag])
         if rev is not None:
-            argv.extend(["--rev", rev])
+            argv.extend(['--rev', rev])
         if subdirectory is not None:
-            argv.extend(["--subdirectory", subdirectory])
+            argv.extend(['--subdirectory', subdirectory])
         if description is not None:
-            argv.extend(["--description", description])
+            argv.extend(['--description', description])
         if force:
-            argv.append("--force")
+            argv.append('--force')
         envelope = self._theta._run(argv, cwd=cwd, env=env)
-        return outcomes.MutationOutput.model_validate(envelope["data"])
+        return outcomes.MutationOutput.model_validate(envelope['data'])
 
     def rule(
         self,
@@ -381,12 +381,12 @@ class Register:
         env: Mapping[str, str] | None = None,
     ) -> outcomes.MutationOutput:
         """Register a rule into the system store"""
-        argv: list[str] = ["register", "rule"]
+        argv: list[str] = ['register', 'rule']
         argv.append(name)
         if force:
-            argv.append("--force")
+            argv.append('--force')
         envelope = self._theta._run(argv, cwd=cwd, env=env)
-        return outcomes.MutationOutput.model_validate(envelope["data"])
+        return outcomes.MutationOutput.model_validate(envelope['data'])
 
     def agent(
         self,
@@ -398,15 +398,15 @@ class Register:
         env: Mapping[str, str] | None = None,
     ) -> outcomes.MutationOutput:
         """Register this agent into the system store"""
-        argv: list[str] = ["register", "agent"]
+        argv: list[str] = ['register', 'agent']
         if name is not None:
-            argv.extend(["--name", name])
+            argv.extend(['--name', name])
         if force:
-            argv.append("--force")
+            argv.append('--force')
         if no_lock:
-            argv.append("--no-lock")
+            argv.append('--no-lock')
         envelope = self._theta._run(argv, cwd=cwd, env=env)
-        return outcomes.MutationOutput.model_validate(envelope["data"])
+        return outcomes.MutationOutput.model_validate(envelope['data'])
 
 
 class Rm:
@@ -425,14 +425,14 @@ class Rm:
         env: Mapping[str, str] | None = None,
     ) -> outcomes.MutationOutput:
         """Remove a rule from the manifest"""
-        argv: list[str] = ["rm", "rule"]
+        argv: list[str] = ['rm', 'rule']
         argv.append(name)
         if delete:
-            argv.append("--delete")
+            argv.append('--delete')
         if no_sync:
-            argv.append("--no-sync")
+            argv.append('--no-sync')
         envelope = self._theta._run(argv, cwd=cwd, env=env)
-        return outcomes.MutationOutput.model_validate(envelope["data"])
+        return outcomes.MutationOutput.model_validate(envelope['data'])
 
     def system(
         self,
@@ -443,13 +443,13 @@ class Rm:
         env: Mapping[str, str] | None = None,
     ) -> outcomes.MutationOutput:
         """Remove the system prompt from the manifest"""
-        argv: list[str] = ["rm", "system"]
+        argv: list[str] = ['rm', 'system']
         if delete:
-            argv.append("--delete")
+            argv.append('--delete')
         if no_sync:
-            argv.append("--no-sync")
+            argv.append('--no-sync')
         envelope = self._theta._run(argv, cwd=cwd, env=env)
-        return outcomes.MutationOutput.model_validate(envelope["data"])
+        return outcomes.MutationOutput.model_validate(envelope['data'])
 
     def tool(
         self,
@@ -458,10 +458,10 @@ class Rm:
         env: Mapping[str, str] | None = None,
     ) -> outcomes.MutationOutput:
         """Remove a tool from the manifest"""
-        argv: list[str] = ["rm", "tool"]
+        argv: list[str] = ['rm', 'tool']
         argv.append(name)
         envelope = self._theta._run(argv, cwd=cwd, env=env)
-        return outcomes.MutationOutput.model_validate(envelope["data"])
+        return outcomes.MutationOutput.model_validate(envelope['data'])
 
     def skill(
         self,
@@ -473,14 +473,14 @@ class Rm:
         env: Mapping[str, str] | None = None,
     ) -> outcomes.MutationOutput:
         """Remove a skill from the manifest"""
-        argv: list[str] = ["rm", "skill"]
+        argv: list[str] = ['rm', 'skill']
         argv.append(name)
         if delete:
-            argv.append("--delete")
+            argv.append('--delete')
         if no_sync:
-            argv.append("--no-sync")
+            argv.append('--no-sync')
         envelope = self._theta._run(argv, cwd=cwd, env=env)
-        return outcomes.MutationOutput.model_validate(envelope["data"])
+        return outcomes.MutationOutput.model_validate(envelope['data'])
 
     def subagent(
         self,
@@ -492,14 +492,14 @@ class Rm:
         env: Mapping[str, str] | None = None,
     ) -> outcomes.MutationOutput:
         """Remove a subagent from the manifest"""
-        argv: list[str] = ["rm", "subagent"]
+        argv: list[str] = ['rm', 'subagent']
         argv.append(name)
         if delete:
-            argv.append("--delete")
+            argv.append('--delete')
         if no_sync:
-            argv.append("--no-sync")
+            argv.append('--no-sync')
         envelope = self._theta._run(argv, cwd=cwd, env=env)
-        return outcomes.MutationOutput.model_validate(envelope["data"])
+        return outcomes.MutationOutput.model_validate(envelope['data'])
 
     def store(
         self,
@@ -509,11 +509,11 @@ class Rm:
         env: Mapping[str, str] | None = None,
     ) -> outcomes.MutationOutput:
         """Unregister a resource from the system store"""
-        argv: list[str] = ["rm", "store"]
+        argv: list[str] = ['rm', 'store']
         argv.append(kind)
         argv.append(name)
         envelope = self._theta._run(argv, cwd=cwd, env=env)
-        return outcomes.MutationOutput.model_validate(envelope["data"])
+        return outcomes.MutationOutput.model_validate(envelope['data'])
 
 
 class Theta:
@@ -562,15 +562,15 @@ class Theta:
         env: Mapping[str, str] | None = None,
     ) -> outcomes.InitOutcome:
         """Scaffold a new theta.toml in the current directory"""
-        argv: list[str] = ["init"]
+        argv: list[str] = ['init']
         if from_ is not None:
-            argv.extend(["--from", from_])
+            argv.extend(['--from', from_])
         if name is not None:
-            argv.extend(["--name", name])
+            argv.extend(['--name', name])
         if force:
-            argv.append("--force")
+            argv.append('--force')
         envelope = self._run(argv, cwd=cwd, env=env)
-        return outcomes.InitOutcome.model_validate(envelope["data"])
+        return outcomes.InitOutcome.model_validate(envelope['data'])
 
     def check(
         self,
@@ -581,13 +581,13 @@ class Theta:
         env: Mapping[str, str] | None = None,
     ) -> outcomes.CheckOutcome:
         """Validate theta.toml and materialized dependencies"""
-        argv: list[str] = ["check"]
+        argv: list[str] = ['check']
         if schema_only:
-            argv.append("--schema-only")
+            argv.append('--schema-only')
         if skip_materialization:
-            argv.append("--skip-materialization")
+            argv.append('--skip-materialization')
         envelope = self._run(argv, cwd=cwd, env=env)
-        return outcomes.CheckOutcome.model_validate(envelope["data"])
+        return outcomes.CheckOutcome.model_validate(envelope['data'])
 
     def describe(
         self,
@@ -599,15 +599,15 @@ class Theta:
         env: Mapping[str, str] | None = None,
     ) -> outcomes.DescribeOutcome:
         """Read or set the agent description"""
-        argv: list[str] = ["describe"]
+        argv: list[str] = ['describe']
         if description is not None:
             argv.append(description)
         if set is not None:
-            argv.extend(["--set", set])
+            argv.extend(['--set', set])
         if rules:
-            argv.append("--rules")
+            argv.append('--rules')
         envelope = self._run(argv, cwd=cwd, env=env)
-        return outcomes.DescribeOutcome.model_validate(envelope["data"])
+        return outcomes.DescribeOutcome.model_validate(envelope['data'])
 
     def lock(
         self,
@@ -617,11 +617,11 @@ class Theta:
         env: Mapping[str, str] | None = None,
     ) -> outcomes.LockOutcome:
         """Resolve all sources and write theta.lock"""
-        argv: list[str] = ["lock"]
+        argv: list[str] = ['lock']
         if force:
-            argv.append("--force")
+            argv.append('--force')
         envelope = self._run(argv, cwd=cwd, env=env)
-        return outcomes.LockOutcome.model_validate(envelope["data"])
+        return outcomes.LockOutcome.model_validate(envelope['data'])
 
     def sync(
         self,
@@ -631,11 +631,11 @@ class Theta:
         env: Mapping[str, str] | None = None,
     ) -> outcomes.SyncOutcome:
         """Materialize dependencies into .theta/"""
-        argv: list[str] = ["sync"]
+        argv: list[str] = ['sync']
         if force:
-            argv.append("--force")
+            argv.append('--force')
         envelope = self._run(argv, cwd=cwd, env=env)
-        return outcomes.SyncOutcome.model_validate(envelope["data"])
+        return outcomes.SyncOutcome.model_validate(envelope['data'])
 
     def tree(
         self,
@@ -643,9 +643,9 @@ class Theta:
         env: Mapping[str, str] | None = None,
     ) -> outcomes.TreeOutcome:
         """Print the subagent dependency tree"""
-        argv: list[str] = ["tree"]
+        argv: list[str] = ['tree']
         envelope = self._run(argv, cwd=cwd, env=env)
-        return outcomes.TreeOutcome.model_validate(envelope["data"])
+        return outcomes.TreeOutcome.model_validate(envelope['data'])
 
 
 _theta: Theta | None = None
@@ -678,9 +678,7 @@ def check(
     env: Mapping[str, str] | None = None,
 ) -> outcomes.CheckOutcome:
     """Validate theta.toml and materialized dependencies"""
-    return _get_theta().check(
-        schema_only=schema_only, skip_materialization=skip_materialization, cwd=cwd, env=env
-    )
+    return _get_theta().check(schema_only=schema_only, skip_materialization=skip_materialization, cwd=cwd, env=env)
 
 
 def describe(
@@ -743,24 +741,7 @@ def add_rule(
     env: Mapping[str, str] | None = None,
 ) -> outcomes.MutationOutput:
     """Scaffold and register a new rule"""
-    return _get_theta().add.rule(
-        name,
-        system=system,
-        path=path,
-        git=git,
-        branch=branch,
-        tag=tag,
-        rev=rev,
-        file=file,
-        sync=sync,
-        content=content,
-        summary=summary,
-        apply=apply,
-        apply_to=apply_to,
-        description=description,
-        cwd=cwd,
-        env=env,
-    )
+    return _get_theta().add.rule(name, system=system, path=path, git=git, branch=branch, tag=tag, rev=rev, file=file, sync=sync, content=content, summary=summary, apply=apply, apply_to=apply_to, description=description, cwd=cwd, env=env)
 
 
 def add_system(
@@ -789,19 +770,7 @@ def add_tool(
     env: Mapping[str, str] | None = None,
 ) -> outcomes.MutationOutput:
     """Register an MCP tool (stdio or HTTP)"""
-    return _get_theta().add.tool(
-        name,
-        command=command,
-        url=url,
-        envs=envs,
-        headers=headers,
-        extra_args=extra_args,
-        disabled=disabled,
-        registry=registry,
-        no_cache=no_cache,
-        cwd=cwd,
-        env=env,
-    )
+    return _get_theta().add.tool(name, command=command, url=url, envs=envs, headers=headers, extra_args=extra_args, disabled=disabled, registry=registry, no_cache=no_cache, cwd=cwd, env=env)
 
 
 def add_skill(
@@ -823,23 +792,7 @@ def add_skill(
     env: Mapping[str, str] | None = None,
 ) -> outcomes.MutationOutput:
     """Scaffold or register a skill"""
-    return _get_theta().add.skill(
-        name_or_ref,
-        name=name,
-        path=path,
-        git=git,
-        branch=branch,
-        tag=tag,
-        rev=rev,
-        subdirectory=subdirectory,
-        description=description,
-        tags=tags,
-        goal=goal,
-        system=system,
-        no_sync=no_sync,
-        cwd=cwd,
-        env=env,
-    )
+    return _get_theta().add.skill(name_or_ref, name=name, path=path, git=git, branch=branch, tag=tag, rev=rev, subdirectory=subdirectory, description=description, tags=tags, goal=goal, system=system, no_sync=no_sync, cwd=cwd, env=env)
 
 
 def add_subagent(
@@ -856,18 +809,7 @@ def add_subagent(
     env: Mapping[str, str] | None = None,
 ) -> outcomes.MutationOutput:
     """Register a subagent (inline or ref)"""
-    return _get_theta().add.subagent(
-        name,
-        agent_ref=agent_ref,
-        description=description,
-        model=model,
-        prompt_path=prompt_path,
-        tools=tools,
-        skills=skills,
-        description_only=description_only,
-        cwd=cwd,
-        env=env,
-    )
+    return _get_theta().add.subagent(name, agent_ref=agent_ref, description=description, model=model, prompt_path=prompt_path, tools=tools, skills=skills, description_only=description_only, cwd=cwd, env=env)
 
 
 def cast_to(
@@ -896,17 +838,7 @@ def cast_from(
     env: Mapping[str, str] | None = None,
 ) -> outcomes.CastFromOutcome:
     """Import a harness-native config into theta.toml"""
-    return _get_theta().cast.from_(
-        source,
-        input=input,
-        force=force,
-        subagent_prompts=subagent_prompts,
-        force_overwrite=force_overwrite,
-        notes=notes,
-        cross_read=cross_read,
-        cwd=cwd,
-        env=env,
-    )
+    return _get_theta().cast.from_(source, input=input, force=force, subagent_prompts=subagent_prompts, force_overwrite=force_overwrite, notes=notes, cross_read=cross_read, cwd=cwd, env=env)
 
 
 def list_rules(
@@ -965,20 +897,7 @@ def register_skill(
     env: Mapping[str, str] | None = None,
 ) -> outcomes.MutationOutput:
     """Register a skill into the system store"""
-    return _get_theta().register.skill(
-        name_or_ref,
-        name=name,
-        path=path,
-        git=git,
-        branch=branch,
-        tag=tag,
-        rev=rev,
-        subdirectory=subdirectory,
-        description=description,
-        force=force,
-        cwd=cwd,
-        env=env,
-    )
+    return _get_theta().register.skill(name_or_ref, name=name, path=path, git=git, branch=branch, tag=tag, rev=rev, subdirectory=subdirectory, description=description, force=force, cwd=cwd, env=env)
 
 
 def register_rule(
@@ -1068,3 +987,4 @@ def rm_store(
 ) -> outcomes.MutationOutput:
     """Unregister a resource from the system store"""
     return _get_theta().rm.store(kind, name, cwd=cwd, env=env)
+

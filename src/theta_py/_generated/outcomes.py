@@ -17,8 +17,8 @@ class ThetaOutcomes(BaseModel):
 
 
 class InitSource(StrEnum):
-    scaffold = "scaffold"
-    store = "store"
+    scaffold = 'scaffold'
+    store = 'store'
 
 
 class InitOutcome(BaseModel):
@@ -36,8 +36,8 @@ class CheckOutcome(BaseModel):
 
 
 class DescribeMode(StrEnum):
-    read = "read"
-    write = "write"
+    read = 'read'
+    write = 'write'
 
 
 class DescribeRule(BaseModel):
@@ -57,40 +57,38 @@ class EntityKind(StrEnum):
     """
     Manifest or store entity that the mutation targets.
     """
-
-    rule = "rule"
-    system = "system"
-    tool = "tool"
-    skill = "skill"
-    subagent = "subagent"
-    agent = "agent"
+    rule = 'rule'
+    system = 'system'
+    tool = 'tool'
+    skill = 'skill'
+    subagent = 'subagent'
+    agent = 'agent'
 
 
 class MutationKind(StrEnum):
     """
     Verb that performed a mutation against either the manifest or the system store.
     """
-
-    add = "add"
-    remove = "remove"
-    register = "register"
-    unregister = "unregister"
+    add = 'add'
+    remove = 'remove'
+    register = 'register'
+    unregister = 'unregister'
 
 
 class MutationSourceKind(StrEnum):
-    local = "local"
-    git = "git"
-    store = "store"
-    inline = "inline"
-    description = "description"
+    local = 'local'
+    git = 'git'
+    store = 'store'
+    inline = 'inline'
+    description = 'description'
 
 
 class ListKind(StrEnum):
-    rules = "rules"
-    tools = "tools"
-    skills = "skills"
-    subagents = "subagents"
-    store = "store"
+    rules = 'rules'
+    tools = 'tools'
+    skills = 'skills'
+    subagents = 'subagents'
+    store = 'store'
 
 
 class ListOutcome(BaseModel):
@@ -136,7 +134,6 @@ class MutationSource(BaseModel):
     """
     Origin description for a newly-added entry. `kind` describes which constructor of the manifest's `src`/`source` union was used; `detail` carries the human-meaningful identifier (path, URL, store name).
     """
-
     detail: str
     kind: MutationSourceKind
 
@@ -147,7 +144,6 @@ class MutationOutput(BaseModel):
 
     `files_written` and `files_deleted` are project-relative when the operation targets a project, absolute when targeting the system store.
     """
-
     entity: EntityKind
     files_deleted: list[str]
     files_written: list[str]

@@ -4,11 +4,11 @@ pre-commit:
     ruff-check:
       glob: "*.py"
       stage_fixed: true
-      run: uv run ruff check --fix {staged_files}
+      run: uv run ruff check --fix --force-exclude {staged_files}
     ruff-format:
       glob: "*.py"
       stage_fixed: true
-      run: uv run ruff format {staged_files}
+      run: uv run ruff format --force-exclude {staged_files}
 
 pre-push:
   parallel: true
