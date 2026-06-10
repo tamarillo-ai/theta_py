@@ -3,4 +3,4 @@
 # Regenerate with `python -m theta_py._codegen`.
 from typing import Final
 
-THETA_VERSION: Final[str] = "0.1.3-rc1"
+THETA_VERSION: Final[str] = "0.1.3-rc2"
