@@ -13,7 +13,10 @@ dependencies = [
 
 [project.urls]
 Homepage = "https://theta.tamarillo.ai/"
-Source = "https://github.com/tamarillo-ai/theta-py"
+Documentation = "https://github.com/tamarillo-ai/theta_py"
+Source = "https://github.com/tamarillo-ai/theta_py"
+Issues = "https://github.com/tamarillo-ai/theta_py/issues"
+Changelog = "https://github.com/tamarillo-ai/theta_py/releases"
 
 [build-system]
 requires = ["hatchling"]

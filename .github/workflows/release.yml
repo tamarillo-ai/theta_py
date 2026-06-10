@@ -174,10 +174,54 @@ jobs:
           name: wheels-all
           path: dist/*.whl
 
+  github-release:
+    name: "create github release"
+    needs: [read-pin, collect]
+    if: ${{ github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: wheels-all
+          path: dist
+      - name: "create release with attached wheels"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+          IS_PRERELEASE: ${{ needs.read-pin.outputs.is_prerelease }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          extra=()
+          [[ "$IS_PRERELEASE" == "true" ]] && extra+=(--prerelease)
+          gh release create "$TAG" \
+            --repo "${{ github.repository }}" \
+            --title "$TAG" \
+            --generate-notes \
+            "${extra[@]}" \
+            dist/*.whl
+
   publish-testpypi:
     name: "publish to TestPyPI"
-    needs: [read-pin, collect]
-    if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.dry_run) }}
+    needs: [read-pin, collect, github-release]
+    # github-release only runs on tag push; on workflow_dispatch it's
+    # skipped. By default, a skipped `needs` dep cascades and skips us
+    # too — `!cancelled()` overrides that so the `if:` actually evaluates.
+    # On tag push, we require github-release to have succeeded; on
+    # workflow_dispatch we accept its `skipped` state.
+    if: >-
+      ${{ !cancelled()
+          && !(github.event_name == 'workflow_dispatch' && inputs.dry_run)
+          && needs.read-pin.result == 'success'
+          && needs.collect.result == 'success'
+          && (needs.github-release.result == 'success'
+              || needs.github-release.result == 'skipped') }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     environment:
