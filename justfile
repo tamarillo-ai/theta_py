@@ -7,3 +7,6 @@ codegen:
 [group: 'test']
 test:
     THETA_BIN=$(which theta) uv run pytest .
+
+test-nn:
+    THETA_BIN=$(which theta) uv run pytest -q -m "not network"

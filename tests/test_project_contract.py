@@ -1,19 +1,17 @@
-"""Contract tests for ThetaProject layout assumptions.
-
-These tests verify that the path constants hardcoded in project.py match the
-actual output of the theta binary. If theta renames '.theta/' to something
-else, or changes where rules/skills land, these tests will fail immediately.
-
-"""
-
 from __future__ import annotations
 
 from theta_py import ThetaProject
-from theta_py.project import (
-    _DOT_THETA,
-    _LOCKFILE,
-    _RULES_DIR,
-    _SYSTEM_FILE,
+from theta_py._generated.constants import (
+    DOT_THETA_DIR as _DOT_THETA,
+)
+from theta_py._generated.constants import (
+    LOCKFILE as _LOCKFILE,
+)
+from theta_py._generated.constants import (
+    RULES_DIR as _RULES_DIR,
+)
+from theta_py._generated.constants import (
+    SYSTEM_FILE_NAME as _SYSTEM_FILE,
 )
 
 

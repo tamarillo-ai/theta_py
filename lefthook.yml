@@ -16,4 +16,4 @@ pre-push:
     ty:
       run: uv run ty check src
     pytest-fast:
-      run: uv run pytest -q -m "not network"
+      run: THETA_BIN=$(which theta) uv run pytest -q -m "not network"
