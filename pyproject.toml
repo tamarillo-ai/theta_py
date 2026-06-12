@@ -41,6 +41,8 @@ dev = [
     "ruff>=0.7",
     "ty>=0.0.1a1",
     "datamodel-code-generator[http]>=0.26",
+    "ipython>=9.14.1",
+    "ipykernel>=7.3.0",
 ]
 
 [tool.ruff]

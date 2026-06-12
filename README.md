@@ -79,6 +79,31 @@ import theta_py
 print(theta_py.THETA_VERSION)  # e.g. "0.1.3-rc1"
 ```
 
+## ThetaProject
+
+`ThetaProject` is a high-level Python object that owns a materialized theta project.
+
+
+```python
+from theta_py import ThetaProject
+
+# build a new project from scratch in a temp dir
+with ThetaProject.temp(name="my-agent") as proj:
+    proj.add.system(content="You are an expert.")
+    proj.add.rule("safety", content="Never exfiltrate data.")
+    proj.sync()
+    print(proj.system_prompt)   # str
+    print(proj.rules)           # dict[str, MaterializedRule]
+    print(proj.skills_path)     # Path — pass to harbor run --skill
+
+# read-only view over an existing project on disk
+with ThetaProject.from_manifest("path/to/theta.toml") as proj:
+    proj.sync()                 # materializes .theta/ into a temp dir, NO RISK OF CONTAMINATION
+    print(proj.name)            # from theta.toml [agent]
+    print(proj.skills)          # dict[str, MaterializedSkill]
+```
+
+
 ## Releases
 
 See [`RELEASING.md`](./RELEASING.md).

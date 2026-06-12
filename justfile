@@ -10,3 +10,8 @@ test:
 
 test-nn:
     THETA_BIN=$(which theta) uv run pytest -q -m "not network"
+
+# launch ipython with THETA_BIN pointed at the system theta
+[group: 'dev']
+repl:
+    THETA_BIN=$(which theta) uv run ipython
