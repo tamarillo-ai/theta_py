@@ -451,6 +451,7 @@ KNOWN_LEAVES: tuple[tuple[str, ...], ...] = (
     ('cast', 'to'),
     ('check',),
     ('describe',),
+    ('get',),
     ('init',),
     ('list', 'rules'),
     ('list', 'skills'),

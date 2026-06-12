@@ -647,6 +647,16 @@ class Theta:
         envelope = self._run(argv, cwd=cwd, env=env)
         return outcomes.TreeOutcome.model_validate(envelope['data'])
 
+    def get(
+        self,
+        cwd: str | os.PathLike[str] | None = None,
+        env: Mapping[str, str] | None = None,
+    ) -> outcomes.GetOutcome:
+        """Emit all materialized project content as JSON (requires theta sync first)"""
+        argv: list[str] = ['get']
+        envelope = self._run(argv, cwd=cwd, env=env)
+        return outcomes.GetOutcome.model_validate(envelope['data'])
+
 
 _theta: Theta | None = None
 
@@ -719,6 +729,14 @@ def tree(
 ) -> outcomes.TreeOutcome:
     """Print the subagent dependency tree"""
     return _get_theta().tree(cwd=cwd, env=env)
+
+
+def get(
+    cwd: str | os.PathLike[str] | None = None,
+    env: Mapping[str, str] | None = None,
+) -> outcomes.GetOutcome:
+    """Emit all materialized project content as JSON (requires theta sync first)"""
+    return _get_theta().get(cwd=cwd, env=env)
 
 
 def add_rule(
