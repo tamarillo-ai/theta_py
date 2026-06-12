@@ -50,10 +50,17 @@ def _setup_init_rule(t: Theta) -> None:
     t.add.rule("smoke-rule")
 
 
+def _setup_init_sync(t: Theta) -> None:
+    t.init(name="smoke-setup")
+    t.add.system(content="smoke system prompt")
+    t.sync()
+
+
 SETUP: dict[str, callable] = {
     "none": lambda t: None,
     "init": _setup_init,
     "init+rule": _setup_init_rule,
+    "init+sync": _setup_init_sync,
 }
 
 
@@ -441,6 +448,19 @@ def test_smoke_schema_flat(workspace: Path) -> None:
     assert isinstance(out, outcomes.SchemaOutcome)
 
 
+def test_smoke_get_namespaced(workspace: Path) -> None:
+    t = Theta()
+    SETUP['init+sync'](t)
+    out = t.get()
+    assert isinstance(out, outcomes.GetOutcome)
+
+
+def test_smoke_get_flat(workspace: Path) -> None:
+    SETUP['init+sync'](Theta())
+    out = verbs.get()
+    assert isinstance(out, outcomes.GetOutcome)
+
+
 KNOWN_LEAVES: tuple[tuple[str, ...], ...] = (
     ('add', 'rule'),
     ('add', 'skill'),
@@ -451,6 +471,7 @@ KNOWN_LEAVES: tuple[tuple[str, ...], ...] = (
     ('cast', 'to'),
     ('check',),
     ('describe',),
+    ('get',),
     ('init',),
     ('list', 'rules'),
     ('list', 'skills'),
@@ -482,6 +503,7 @@ RECIPED_LEAVES: frozenset[tuple[str, ...]] = frozenset({
     ('cast', 'to'),
     ('check',),
     ('describe',),
+    ('get',),
     ('init',),
     ('list', 'rules'),
     ('list', 'skills'),

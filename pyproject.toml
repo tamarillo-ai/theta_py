@@ -1,6 +1,6 @@
 [project]
 name = "theta-py"
-version = "0.0.3"
+version = "0.0.4"
 description = "Python bindings for the theta CLI"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -60,7 +60,7 @@ quote-style = "double"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-ra --strict-markers"
+addopts = "-ra --strict-markers -m 'not network'"
 markers = [
     "integration: runs against a real theta binary",
     "network: hits the live Gemini API",

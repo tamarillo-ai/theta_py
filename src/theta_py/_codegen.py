@@ -383,12 +383,263 @@ def write_verbs_module(leaves: list[dict[str, Any]]) -> None:
     (GENERATED / "verbs.py").write_text("\n".join(lines))
 
 
+def fetch_manifest_schema(binary: Path) -> dict[str, Any]:
+    result = subprocess.run(
+        [str(binary), "schema", "--output-format", "json"],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    return json.loads(result.stdout)
+
+
+def write_manifest_module(binary: Path) -> None:
+    """Generate ``_generated/manifest.py`` from ``theta schema --output-format json``.
+
+    The module contains a Pydantic ``ThetaManifest`` model and all referenced
+    sub-types (``Agent``, ``Instructions``, ``Rule``, ``Skill``, etc.).
+    These are the Python counterparts of the Rust ``theta-schema`` types.
+    """
+    schema = fetch_manifest_schema(binary)
+    schema = _normalize_schema(schema)
+
+    SCHEMAS.mkdir(parents=True, exist_ok=True)
+    schema_path = SCHEMAS / "manifest.json"
+    schema_path.write_text(json.dumps(schema, indent=2))
+
+    target = GENERATED / "manifest.py"
+    subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "datamodel_code_generator",
+            "--input",
+            str(schema_path),
+            "--input-file-type",
+            "jsonschema",
+            "--output",
+            str(target),
+            "--output-model-type",
+            "pydantic_v2.BaseModel",
+            "--target-python-version",
+            "3.12",
+            "--use-standard-collections",
+            "--use-union-operator",
+            "--collapse-root-models",
+            "--use-schema-description",
+            "--disable-timestamp",
+            "--formatters",
+            "black",
+            "--formatters",
+            "isort",
+        ],
+        check=True,
+    )
+    existing = target.read_text()
+    target.write_text(AUTOGEN_HEADER + existing)
+
+
+def write_constants_module(binary: Path) -> None:
+    """Generate ``_generated/constants.py`` from ``theta schema --constants``.
+
+    Produces ``Final[str]`` constants for all theta-static path names so
+    ``project.py`` never hardcodes them.  Requires theta >= 0.1.4.
+    """
+    result = subprocess.run(
+        [str(binary), "schema", "--constants"],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    data: dict[str, Any] = json.loads(result.stdout)
+
+    lines = [
+        AUTOGEN_HEADER,
+        "# Path and file-name constants from theta-static.",
+        "# Source of truth: ``theta schema --constants``.",
+        "from typing import Final",
+        "",
+        "",
+    ]
+    for key, value in sorted(data.items()):
+        const_name = key.upper()
+        lines.append(f"{const_name}: Final[str] = {value!r}")
+
+    (GENERATED / "constants.py").write_text("\n".join(lines) + "\n")
+
+
 def write_init() -> None:
     (GENERATED / "__init__.py").write_text(
         AUTOGEN_HEADER
-        + "from theta_py._generated import outcomes, verbs\n\n"
-        + '__all__ = ["outcomes", "verbs"]\n',
+        + "from theta_py._generated import constants, manifest, outcomes, verbs\n\n"
+        + '__all__ = ["constants", "manifest", "outcomes", "verbs"]\n',
     )
+
+
+def write_project_module() -> None:
+    import importlib.util
+    import sys
+    import types as _builtin_types
+    import typing
+
+    _KEY = "_theta_outcomes_isolated"
+    out_path = GENERATED / "outcomes.py"
+    spec = importlib.util.spec_from_file_location(_KEY, out_path)
+    assert spec
+    assert spec.loader
+    out_mod = importlib.util.module_from_spec(spec)
+
+    # HACK
+    sys.modules[_KEY] = out_mod
+    try:
+        spec.loader.exec_module(out_mod)  # type: ignore[union-attr]
+    finally:
+        sys.modules.pop(_KEY, None)
+
+    GetOutcome = out_mod.GetOutcome
+    AgentInfo = out_mod.AgentInfo
+
+    def _type_str(tp: Any) -> str:
+        if tp is type(None):
+            return "None"
+        if isinstance(tp, _builtin_types.UnionType):
+            parts = [_type_str(a) for a in tp.__args__]
+            non_none = [p for p in parts if p != "None"]
+            return f"{non_none[0]} | None" if len(non_none) == 1 and len(parts) == 2 else " | ".join(parts)
+        origin = getattr(tp, "__origin__", None)
+        args: tuple[Any, ...] = getattr(tp, "__args__", ())
+        if origin is typing.Union:
+            parts = [_type_str(a) for a in args]
+            non_none = [p for p in parts if p != "None"]
+            return f"{non_none[0]} | None" if len(non_none) == 1 and len(parts) == 2 else " | ".join(parts)
+        if origin is dict:
+            return f"dict[{_type_str(args[0])}, {_type_str(args[1])}]"
+        if origin is list:
+            return f"list[{_type_str(args[0])}]"
+        name = getattr(tp, "__name__", None) or getattr(tp, "_name", None) or repr(tp)
+        return name
+
+    agent_fields = list(AgentInfo.model_fields.items())
+    outcome_fields = [(f, i) for f, i in GetOutcome.model_fields.items() if f != "agent"]
+
+    builtins = {"str", "int", "float", "bool", "list", "dict", "Any", "None", "Path"}
+    needed: set[str] = set()
+    for _, info in outcome_fields:
+        for token in (
+            _type_str(info.annotation)
+            .replace("[", " ")
+            .replace("]", " ")
+            .replace("|", " ")
+            .replace(",", " ")
+            .split()
+        ):
+            if token and token[0].isupper() and token not in builtins:
+                needed.add(token)
+
+    lines: list[str] = [
+        AUTOGEN_HEADER,
+        "from __future__ import annotations",
+        "",
+        "from pathlib import Path",
+        "",
+    ]
+    if needed:
+        lines.append("from theta_py._generated.outcomes import (")
+        for name in sorted(needed):
+            lines.append(f"    {name},")
+        lines.append(")")
+    lines += [
+        "",
+        "",
+        "class ThetaProjectMixin:",
+    ]
+
+    for field, info in agent_fields:
+        tp_str = _type_str(info.annotation)
+        default = " or []" if tp_str.startswith("list") else ""
+        lines += [
+            "    @property",
+            f"    def {field}(self) -> {tp_str}:",
+            f"        return self.manifest.agent.{field}{default}",
+            "",
+        ]
+
+    for field, info in outcome_fields:
+        tp_str = _type_str(info.annotation)
+        lines += [
+            "    @property",
+            f"    def {field}(self) -> {tp_str}:",
+            f"        return self._materialized.{field}",
+            "",
+        ]
+
+    (GENERATED / "project.py").write_text("\n".join(lines) + "\n")
+
+
+def write_public_init() -> None:
+    content = (
+        AUTOGEN_HEADER
+        + '"""Python bindings for the theta CLI.\n'
+        + "\n"
+        + "Quick start::\n"
+        + "\n"
+        + "    from theta_py import ThetaProject, theta\n"
+        + "\n"
+        + '    with ThetaProject.temp(name="my-agent") as proj:\n'
+        + '        proj.add.system(content="You are an expert.")\n'
+        + "        proj.sync()\n"
+        + "        print(proj.system_prompt)\n"
+        + '"""\n'
+        + "\n"
+        + "from typing import Any\n"
+        + "\n"
+        + "from theta_py._version import THETA_VERSION\n"
+        + "from theta_py.errors import (\n"
+        + "    ThetaBinaryNotFoundError,\n"
+        + "    ThetaCommandError,\n"
+        + "    ThetaError,\n"
+        + "    ThetaInvocationError,\n"
+        + ")\n"
+        + "\n"
+        + "__version__ = THETA_VERSION\n"
+        + "\n"
+        + "\n"
+        + "def __getattr__(name: str) -> Any:\n"
+        + '    if name == "ThetaProject":\n'
+        + "        from theta_py.project import ThetaProject as _tp\n"
+        + "        return _tp\n"
+        + '    if name == "ThetaManifest":\n'
+        + "        from theta_py._generated.manifest import ThetaManifest as _m\n"
+        + "        return _m\n"
+        + '    _outcomes = {"AgentInfo", "GetOutcome", "MaterializedRule", "MaterializedSkill", "MaterializedTool"}\n'
+        + "    if name in _outcomes:\n"
+        + "        from theta_py._generated import outcomes as _o\n"
+        + "        return getattr(_o, name)\n"
+        + "    from theta_py._generated import verbs as _v\n"
+        + '    if name == "theta":\n'
+        + "        return _v._get_theta()\n"
+        + "    if hasattr(_v, name):\n"
+        + "        return getattr(_v, name)\n"
+        + '    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")\n'
+        + "\n"
+        + "\n"
+        + "__all__ = [\n"
+        + '    "THETA_VERSION",\n'
+        + '    "AgentInfo",\n'
+        + '    "GetOutcome",\n'
+        + '    "MaterializedRule",\n'
+        + '    "MaterializedSkill",\n'
+        + '    "MaterializedTool",\n'
+        + '    "Theta",\n'
+        + '    "ThetaBinaryNotFoundError",\n'
+        + '    "ThetaCommandError",\n'
+        + '    "ThetaError",\n'
+        + '    "ThetaInvocationError",\n'
+        + '    "ThetaManifest",\n'
+        + '    "ThetaProject",\n'
+        + "]\n"
+    )
+    (PACKAGE_DIR / "__init__.py").write_text(content)
 
 
 def write_version(version: str) -> None:
@@ -399,7 +650,7 @@ def write_version(version: str) -> None:
     )
 
 
-# Smoke-test recipes. Keyed by tuple(verb_path). Frozen so codegen cannot be
+# smoke-test recipes. Keyed by tuple(verb_path). Frozen so codegen cannot be
 # silently mutated by an importer.
 SMOKE_RECIPES: Mapping[tuple[str, ...], Mapping[str, Any]] = MappingProxyType(
     {
@@ -408,6 +659,7 @@ SMOKE_RECIPES: Mapping[tuple[str, ...], Mapping[str, Any]] = MappingProxyType(
         ("describe",): {"setup": "init", "args": {}},
         ("lock",): {"setup": "init", "args": {}},
         ("sync",): {"setup": "init", "args": {}},
+        ("get",): {"setup": "init+sync", "args": {}},
         ("tree",): {"setup": "init", "args": {}},
         ("schema",): {
             "setup": "none",
@@ -531,10 +783,17 @@ def _setup_init_rule(t: Theta) -> None:
     t.add.rule("smoke-rule")
 
 
+def _setup_init_sync(t: Theta) -> None:
+    t.init(name="smoke-setup")
+    t.add.system(content="smoke system prompt")
+    t.sync()
+
+
 SETUP: dict[str, callable] = {
     "none": lambda t: None,
     "init": _setup_init,
     "init+rule": _setup_init_rule,
+    "init+sync": _setup_init_sync,
 }
 """
 
@@ -566,7 +825,7 @@ def write_smoke_tests(leaves: list[dict[str, Any]]) -> None:
 
         decorator = f"@pytest.mark.skip(reason={skip_reason!r})\n" if skip_reason else ""
 
-        # Namespaced surface
+        # namespaced surface
         c(
             f"{decorator}"
             f"def test_smoke_{fn_safe}_namespaced(workspace: Path) -> None:\n"
@@ -577,7 +836,7 @@ def write_smoke_tests(leaves: list[dict[str, Any]]) -> None:
         )
         c("")
 
-        # Flat surface
+        # flat surface
         c(
             f"{decorator}"
             f"def test_smoke_{fn_safe}_flat(workspace: Path) -> None:\n"
@@ -587,7 +846,7 @@ def write_smoke_tests(leaves: list[dict[str, Any]]) -> None:
         )
         c("")
 
-    # Drift detector
+    # drift detector
     leaf_paths = sorted(tuple(leaf["path"]) for leaf in leaves)
     c("KNOWN_LEAVES: tuple[tuple[str, ...], ...] = (")
     for p in leaf_paths:
@@ -658,7 +917,11 @@ def main() -> int:
     write_outcomes_module(leaves)
     write_verbs_module(leaves)
     write_smoke_tests(leaves)
+    write_manifest_module(binary)
+    write_constants_module(binary)
+    write_project_module()
     write_init()
+    write_public_init()
     write_version(version)
     print(f"generated {len(leaves)} verb wrappers in {GENERATED}")
     return 0
