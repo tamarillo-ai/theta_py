@@ -7,7 +7,7 @@ Quick start::
 
     from theta_py import ThetaProject, theta
 
-    with ThetaProject.temp(name="my-agent") as proj:
+    with ThetaProject.create(name="my-agent") as proj:
         proj.add.system(content="You are an expert.")
         proj.sync()
         print(proj.system_prompt)
@@ -35,7 +35,7 @@ def __getattr__(name: str) -> Any:
         from theta_py._generated.manifest import ThetaManifest as _m
 
         return _m
-    _outcomes = {"AgentInfo", "GetOutcome", "MaterializedRule", "MaterializedSkill", "MaterializedTool"}
+    _outcomes = {"AgentInfo", "MaterializedRule", "MaterializedSkill", "MaterializedTool", "ProjectSnapshot"}
     if name in _outcomes:
         from theta_py._generated import outcomes as _o
 
@@ -52,10 +52,10 @@ def __getattr__(name: str) -> Any:
 __all__ = [
     "THETA_VERSION",
     "AgentInfo",
-    "GetOutcome",
     "MaterializedRule",
     "MaterializedSkill",
     "MaterializedTool",
+    "ProjectSnapshot",
     "Theta",
     "ThetaBinaryNotFoundError",
     "ThetaCommandError",

@@ -21,14 +21,14 @@ class InitSource(StrEnum):
     store = 'store'
 
 
-class InitOutcome(BaseModel):
+class InitOutput(BaseModel):
     agent_name: str | None = None
     gitignore_appended: bool
     manifest_path: str
     source: InitSource
 
 
-class CheckOutcome(BaseModel):
+class CheckReport(BaseModel):
     errors: conint(ge=0)
     hints: conint(ge=0)
     valid: bool
@@ -47,7 +47,7 @@ class DescribeRule(BaseModel):
     summary: str | None = None
 
 
-class DescribeOutcome(BaseModel):
+class DescribeOutput(BaseModel):
     description: str | None = None
     mode: DescribeMode
     rules: list[DescribeRule] | None = None
@@ -91,29 +91,29 @@ class ListKind(StrEnum):
     store = 'store'
 
 
-class ListOutcome(BaseModel):
+class ListOutput(BaseModel):
     entries: Any
     kind: ListKind
 
 
-class LockOutcome(BaseModel):
+class LockOutput(BaseModel):
     lockfile_path: str
     wrote: bool
 
 
-class SyncOutcome(BaseModel):
+class SyncOutput(BaseModel):
     created: conint(ge=0)
     theta_dir: str
     updated: conint(ge=0)
 
 
-class CastToOutcome(BaseModel):
+class CastToOutput(BaseModel):
     files_written: list[str]
     output_dir: str
     target: str
 
 
-class CastFromOutcome(BaseModel):
+class CastFromOutput(BaseModel):
     files_written: list[str]
     manifest_path: str
     source: str
@@ -126,7 +126,7 @@ class TreeNode(BaseModel):
     name: str
 
 
-class TreeOutcome(BaseModel):
+class TreeOutput(BaseModel):
     tree: TreeNode
 
 
@@ -177,7 +177,7 @@ class MaterializedTool(BaseModel):
     url: str | None = None
 
 
-class GetOutcome(BaseModel):
+class ProjectSnapshot(BaseModel):
     """
     The full materialized state of a theta project.
     """

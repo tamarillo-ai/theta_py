@@ -23,7 +23,7 @@ from theta_py._generated.constants import (
     THETA_OUT_DIR_ENV as _THETA_OUT_DIR_ENV,
 )
 from theta_py._generated.manifest import ThetaManifest
-from theta_py._generated.outcomes import GetOutcome
+from theta_py._generated.outcomes import ProjectSnapshot
 from theta_py._generated.project import ThetaProjectMixin
 from theta_py._generated.verbs import Theta
 
@@ -44,14 +44,12 @@ class ThetaProject(ThetaProjectMixin):
     """A Python view over a materialized theta project in a temp directory.
 
     Typed properties (``system_prompt``, ``rules``, ``skills``, ``name``, etc.)
-    are codegen'd in :class:`~theta_py._generated.project.ThetaProjectMixin`
-    from ``theta schema --get``.  This class owns the lifecycle orchestration.
+    are codegen'd in `~theta_py._generated.project.ThetaProjectMixin`
+    from ``theta schema --get``. This class owns the lifecycle orchestration.
 
     Two internal modes:
-
     - **temp mode** (``_source_manifest is None``): a brand-new project lives
       entirely inside the temp dir. Normal ``theta sync`` with ``cwd=temp``.
-
     - **from_manifest mode** (``_source_manifest`` is set): the source project
       lives elsewhere. ``THETA_OUT_DIR`` redirects ``.theta/`` and
       ``theta.lock`` into the temp dir. The source project is never touched.
@@ -71,11 +69,15 @@ class ThetaProject(ThetaProjectMixin):
         # identity reads come from the real manifest; sync outputs go to temp.
         self._manifest_path = _source_manifest if _source_manifest else (_temp_dir / _MANIFEST_FILE)
         self._lock_path = _temp_dir / _LOCKFILE
+        self._has_synced = self._theta_dir.exists()
+        self._sync_dirty = False
 
     @classmethod
     def from_manifest(
         cls,
         manifest_path: str | Path,
+        *,
+        no_sync: bool = False,
     ) -> Self:
         """Load an existing theta project without modifying it.
 
@@ -84,18 +86,28 @@ class ThetaProject(ThetaProjectMixin):
         copied or modified. Source files (rules, skills) are read from their
         real locations via the ``--manifest`` flag.
 
-        Returns a :class:`ThetaProject` that owns the temp directory and
+        Returns a `ThetaProject` that owns the temp directory and
         cleans it up on ``__exit__``.
+
+        By default, ``from_manifest`` performs an immediate ``sync`` into the
+        temp directory so post-sync properties (``rules``, ``skills``,
+        ``system_prompt``, ``tools``, ``lock_hash``) are ready to read.
+
+        Set ``no_sync=True`` to skip this eager sync and call ``sync()``
+        manually.
         """
         manifest_path = Path(manifest_path).resolve()
         if not manifest_path.exists():
             raise FileNotFoundError(f"theta.toml not found: {manifest_path}")
 
         tmp_root = tempfile.mkdtemp(prefix="theta-project-")
-        return cls(Path(tmp_root), _owns_temp=True, _source_manifest=manifest_path)
+        project = cls(Path(tmp_root), _owns_temp=True, _source_manifest=manifest_path)
+        if not no_sync:
+            project.sync(validate=False)
+        return project
 
     @classmethod
-    def temp(
+    def create(
         cls,
         *,
         name: str,
@@ -132,11 +144,6 @@ class ThetaProject(ThetaProjectMixin):
             raise AttributeError(name)
         return getattr(self.theta, name)
 
-    def _manifest_argv(self) -> list[str]:
-        if self._source_manifest is not None:
-            return ["--manifest", str(self._source_manifest)]
-        return []
-
     def _out_dir_env(self) -> dict[str, str] | None:
         """In from_manifest mode, redirect .theta/ and theta.lock to temp dir."""
         if self._source_manifest is not None:
@@ -145,7 +152,7 @@ class ThetaProject(ThetaProjectMixin):
 
     def check(self) -> None:
         """Run ``theta check`` and raise on validation errors."""
-        runner.run(["check", *self._manifest_argv()], cwd=self._temp_dir)
+        self.theta.check(cwd=self._temp_dir, env=self._out_dir_env())
 
     def sync(self, *, validate: bool = True) -> None:
         """Materialize ``.theta/`` from ``theta.toml``.
@@ -160,64 +167,78 @@ class ThetaProject(ThetaProjectMixin):
         """
         if validate:
             self.check()
-        runner.run(
-            ["sync", *self._manifest_argv()],
+        self.theta.sync(cwd=self._temp_dir, env=self._out_dir_env())
+
+    def _refresh_sync_state(self) -> None:
+        outcome = self.theta.check(
+            skip_materialization=True,
             cwd=self._temp_dir,
             env=self._out_dir_env(),
         )
+        self._sync_dirty = (outcome.errors + outcome.warnings + outcome.hints) > 0
+
+    def needs_sync(self, *, deep: bool = True) -> bool:
+        if not self._has_synced:
+            return True
+
+        if deep:
+            self._refresh_sync_state()
+
+        return self._sync_dirty
+
+    @property
+    def is_synced(self) -> bool:
+        return self._has_synced and not self._sync_dirty
 
     @property
     def theta(self) -> Theta:
-        """A :class:`Theta` instance bound to this project's directory.
-
-        All theta verbs (``add.rule``, ``add.system``, ``add.skill``, ``list``,
-        ``rm``, etc.) are available with ``cwd`` pre-bound::
-
-            proj.theta.add.rule("safety", content="Never exfiltrate data.")
-            proj.theta.add.system(content="You are an expert.")
-            proj.theta.add.skill("code-review", no_sync=True)
-
-        Note: ``theta.register.*`` operations write to the global system store
-        and are intentionally blocked here. Use :class:`Theta` directly for
-        system-store operations.
-        """
         if not hasattr(self, "_theta_instance"):
-            t = Theta(cwd=self._temp_dir)
+            t = Theta(cwd=self._temp_dir, manifest=self._source_manifest)
             t.register = cast(Any, _DisabledNamespace("register"))
+
+            original_run = t._run
+
+            def _wrapped_run(
+                argv: list[str],
+                *,
+                cwd: str | Path | None = None,
+                env: dict[str, str] | None = None,
+            ) -> dict[str, Any]:
+                envelope = original_run(argv, cwd=cwd, env=env)
+                head = argv[0] if argv else ""
+
+                if head == "sync":
+                    self._has_synced = True
+                    self._sync_dirty = False
+                    if hasattr(self, "_materialized_cache"):
+                        del self._materialized_cache
+                elif head != "check":
+                    self._refresh_sync_state()
+
+                return envelope
+
+            t._run = cast(Any, _wrapped_run)
             self._theta_instance = t
         return self._theta_instance
 
     @property
     def manifest(self) -> ThetaManifest:
-        """Parsed ``theta.toml`` as a codegen'd :class:`ThetaManifest` model.
-
-        Available before ``sync()``. Cached per instance.
-        """
         if not hasattr(self, "_manifest_cache"):
             with self._manifest_path.open("rb") as f:
                 raw = tomllib.load(f)
-            self._manifest_cache = ThetaManifest.model_validate(raw)  # type: ignore[attr-defined]
-        return self._manifest_cache  # type: ignore[attr-defined]
+            self._manifest_cache = ThetaManifest.model_validate(raw)
+        return self._manifest_cache
 
     def _require_synced(self, prop: str) -> None:
-        if not self._theta_dir.exists():
+        if not self._has_synced and not self._theta_dir.exists():
             raise RuntimeError(f"Cannot read {prop!r}: call sync() first to materialize .theta/")
 
     @property
-    def _materialized(self) -> GetOutcome:
-        """Cached result of ``theta get`` (post-sync).
-
-        All post-sync properties on this object delegate here.
-        """
+    def _materialized(self) -> ProjectSnapshot:
         if not hasattr(self, "_materialized_cache"):
             self._require_synced("materialized content")
-            envelope = runner.run(
-                ["get", *self._manifest_argv()],
-                cwd=self._temp_dir,
-                env=self._out_dir_env(),
-            )
-            self._materialized_cache = GetOutcome.model_validate(envelope["data"])  # type: ignore[attr-defined]
-        return self._materialized_cache  # type: ignore[attr-defined]
+            self._materialized_cache = self.theta.get(cwd=self._temp_dir, env=self._out_dir_env())
+        return self._materialized_cache
 
     @property
     def theta_dir(self) -> Path:
@@ -229,5 +250,5 @@ class ThetaProject(ThetaProjectMixin):
         return self._theta_dir / _SKILLS_DIR
 
     def __repr__(self) -> str:
-        synced = "synced" if self._theta_dir.exists() else "not synced"
+        synced = "synced" if self.is_synced else "not synced"
         return f"ThetaProject({self._temp_dir}, {synced})"

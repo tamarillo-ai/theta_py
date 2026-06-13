@@ -14,4 +14,4 @@ test-nn:
 # launch ipython with THETA_BIN pointed at the system theta
 [group: 'dev']
 repl:
-    THETA_BIN=$(which theta) uv run ipython
+    THETA_BIN=$(which theta) uv run --dev ipython

@@ -326,10 +326,12 @@ def write_verbs_module(leaves: list[dict[str, Any]]) -> None:
     c("        *,")
     c("        binary: str | os.PathLike[str] | None = None,")
     c("        cwd: str | os.PathLike[str] | None = None,")
+    c("        manifest: str | os.PathLike[str] | None = None,")
     c("        env: Mapping[str, str] | None = None,")
     c("    ) -> None:")
     c("        self._binary: Path = Path(binary) if binary is not None else runner._resolve_binary()")
     c("        self._cwd = cwd")
+    c("        self._manifest = Path(manifest) if manifest is not None else None")
     c("        self._env = env")
     for namespace in sorted(namespaces):
         c(f"        self.{namespace} = {namespace.capitalize()}(self)")
@@ -351,7 +353,12 @@ def write_verbs_module(leaves: list[dict[str, Any]]) -> None:
     c("        else:")
     c("            effective_cwd = os.getcwd()")
     c("        effective_env = env if env is not None else self._env")
-    c("        return runner.run_with_binary(self._binary, argv, cwd=effective_cwd, env=effective_env)")
+    c("        effective_argv = argv")
+    c("        if self._manifest is not None and '--manifest' not in argv:")
+    c("            effective_argv = ['--manifest', str(self._manifest), *argv]")
+    c(
+        "        return runner.run_with_binary(self._binary, effective_argv, cwd=effective_cwd, env=effective_env)"
+    )
     c("")
     for leaf in root_leaves:
         c(render_root_verb_method(leaf))
@@ -476,11 +483,36 @@ def write_init() -> None:
     )
 
 
-def write_project_module() -> None:
+def _get_leaf(leaves: list[dict[str, Any]], path: list[str]) -> dict[str, Any]:
+    for leaf in leaves:
+        if leaf["path"] == path:
+            return leaf
+    raise RuntimeError(f"verb {path!r} not found in verb tree")
+
+
+def _snapshot_class_name(leaves: list[dict[str, Any]]) -> str:
+    return _get_leaf(leaves, ["get"])["output_schema"]["title"]
+
+
+def _agent_class_name(leaves: list[dict[str, Any]]) -> str:
+    schema = _get_leaf(leaves, ["get"])["output_schema"]
+    ref = schema.get("properties", {}).get("agent", {}).get("$ref", "")
+    return ref.split("/")[-1] if ref else "AgentInfo"
+
+
+def _snapshot_definition_names(leaves: list[dict[str, Any]]) -> list[str]:
+    schema = _get_leaf(leaves, ["get"])["output_schema"]
+    return sorted(schema.get("definitions", {}).keys())
+
+
+def write_project_module(leaves: list[dict[str, Any]]) -> None:
     import importlib.util
     import sys
     import types as _builtin_types
     import typing
+
+    snapshot_class_name = _snapshot_class_name(leaves)
+    agent_class_name = _agent_class_name(leaves)
 
     _KEY = "_theta_outcomes_isolated"
     out_path = GENERATED / "outcomes.py"
@@ -492,12 +524,12 @@ def write_project_module() -> None:
     # HACK
     sys.modules[_KEY] = out_mod
     try:
-        spec.loader.exec_module(out_mod)  # type: ignore[union-attr]
+        spec.loader.exec_module(out_mod)
     finally:
         sys.modules.pop(_KEY, None)
 
-    GetOutcome = out_mod.GetOutcome
-    AgentInfo = out_mod.AgentInfo
+    SnapshotClass = getattr(out_mod, snapshot_class_name)
+    AgentClass = getattr(out_mod, agent_class_name)
 
     def _type_str(tp: Any) -> str:
         if tp is type(None):
@@ -519,8 +551,8 @@ def write_project_module() -> None:
         name = getattr(tp, "__name__", None) or getattr(tp, "_name", None) or repr(tp)
         return name
 
-    agent_fields = list(AgentInfo.model_fields.items())
-    outcome_fields = [(f, i) for f, i in GetOutcome.model_fields.items() if f != "agent"]
+    agent_fields = list(AgentClass.model_fields.items())
+    outcome_fields = [(f, i) for f, i in SnapshotClass.model_fields.items() if f != "agent"]
 
     builtins = {"str", "int", "float", "bool", "list", "dict", "Any", "None", "Path"}
     needed: set[str] = set()
@@ -576,7 +608,13 @@ def write_project_module() -> None:
     (GENERATED / "project.py").write_text("\n".join(lines) + "\n")
 
 
-def write_public_init() -> None:
+def write_public_init(leaves: list[dict[str, Any]]) -> None:
+    snapshot_name = _snapshot_class_name(leaves)
+    # All types from the get verb schema definitions are user-facing.
+    outcome_types = sorted({snapshot_name} | set(_snapshot_definition_names(leaves)))
+    outcome_set_literal = "{" + ", ".join(f'"{n}"' for n in outcome_types) + "}"
+    outcome_all_lines = "".join(f'    "{n}",\n' for n in outcome_types)
+
     content = (
         AUTOGEN_HEADER
         + '"""Python bindings for the theta CLI.\n'
@@ -585,7 +623,7 @@ def write_public_init() -> None:
         + "\n"
         + "    from theta_py import ThetaProject, theta\n"
         + "\n"
-        + '    with ThetaProject.temp(name="my-agent") as proj:\n'
+        + '    with ThetaProject.create(name="my-agent") as proj:\n'
         + '        proj.add.system(content="You are an expert.")\n'
         + "        proj.sync()\n"
         + "        print(proj.system_prompt)\n"
@@ -611,7 +649,7 @@ def write_public_init() -> None:
         + '    if name == "ThetaManifest":\n'
         + "        from theta_py._generated.manifest import ThetaManifest as _m\n"
         + "        return _m\n"
-        + '    _outcomes = {"AgentInfo", "GetOutcome", "MaterializedRule", "MaterializedSkill", "MaterializedTool"}\n'
+        + f"    _outcomes = {outcome_set_literal}\n"
         + "    if name in _outcomes:\n"
         + "        from theta_py._generated import outcomes as _o\n"
         + "        return getattr(_o, name)\n"
@@ -625,11 +663,7 @@ def write_public_init() -> None:
         + "\n"
         + "__all__ = [\n"
         + '    "THETA_VERSION",\n'
-        + '    "AgentInfo",\n'
-        + '    "GetOutcome",\n'
-        + '    "MaterializedRule",\n'
-        + '    "MaterializedSkill",\n'
-        + '    "MaterializedTool",\n'
+        + outcome_all_lines
         + '    "Theta",\n'
         + '    "ThetaBinaryNotFoundError",\n'
         + '    "ThetaCommandError",\n'
@@ -919,9 +953,9 @@ def main() -> int:
     write_smoke_tests(leaves)
     write_manifest_module(binary)
     write_constants_module(binary)
-    write_project_module()
+    write_project_module(leaves)
     write_init()
-    write_public_init()
+    write_public_init(leaves)
     write_version(version)
     print(f"generated {len(leaves)} verb wrappers in {GENERATED}")
     return 0
