@@ -36,6 +36,11 @@ class Add:
         apply: str | None = None,
         apply_to: str | None = None,
         description: str | None = None,
+        directory: str | None = None,
+        manifest: str | None = None,
+        instructions_dir: str | None = None,
+        rules_dir: str | None = None,
+        output_format: str | None = None,
         cwd: str | os.PathLike[str] | None = None,
         env: Mapping[str, str] | None = None,
     ) -> outcomes.MutationOutput:
@@ -68,6 +73,16 @@ class Add:
             argv.extend(['--apply-to', apply_to])
         if description is not None:
             argv.extend(['--description', description])
+        if directory is not None:
+            argv.extend(['--directory', directory])
+        if manifest is not None:
+            argv.extend(['--manifest', manifest])
+        if instructions_dir is not None:
+            argv.extend(['--instructions-dir', instructions_dir])
+        if rules_dir is not None:
+            argv.extend(['--rules-dir', rules_dir])
+        if output_format is not None:
+            argv.extend(['--output-format', output_format])
         envelope = self._theta._run(argv, cwd=cwd, env=env)
         return outcomes.MutationOutput.model_validate(envelope['data'])
 
@@ -76,6 +91,11 @@ class Add:
         *,
         path: str | None = None,
         content: str | None = None,
+        directory: str | None = None,
+        manifest: str | None = None,
+        instructions_dir: str | None = None,
+        rules_dir: str | None = None,
+        output_format: str | None = None,
         cwd: str | os.PathLike[str] | None = None,
         env: Mapping[str, str] | None = None,
     ) -> outcomes.MutationOutput:
@@ -85,6 +105,16 @@ class Add:
             argv.extend(['--path', path])
         if content is not None:
             argv.extend(['--content', content])
+        if directory is not None:
+            argv.extend(['--directory', directory])
+        if manifest is not None:
+            argv.extend(['--manifest', manifest])
+        if instructions_dir is not None:
+            argv.extend(['--instructions-dir', instructions_dir])
+        if rules_dir is not None:
+            argv.extend(['--rules-dir', rules_dir])
+        if output_format is not None:
+            argv.extend(['--output-format', output_format])
         envelope = self._theta._run(argv, cwd=cwd, env=env)
         return outcomes.MutationOutput.model_validate(envelope['data'])
 
@@ -100,6 +130,11 @@ class Add:
         disabled: bool = False,
         registry: str | None = None,
         no_cache: bool = False,
+        directory: str | None = None,
+        manifest: str | None = None,
+        instructions_dir: str | None = None,
+        rules_dir: str | None = None,
+        output_format: str | None = None,
         cwd: str | os.PathLike[str] | None = None,
         env: Mapping[str, str] | None = None,
     ) -> outcomes.MutationOutput:
@@ -122,6 +157,16 @@ class Add:
             argv.extend(['--registry', registry])
         if no_cache:
             argv.append('--no-cache')
+        if directory is not None:
+            argv.extend(['--directory', directory])
+        if manifest is not None:
+            argv.extend(['--manifest', manifest])
+        if instructions_dir is not None:
+            argv.extend(['--instructions-dir', instructions_dir])
+        if rules_dir is not None:
+            argv.extend(['--rules-dir', rules_dir])
+        if output_format is not None:
+            argv.extend(['--output-format', output_format])
         envelope = self._theta._run(argv, cwd=cwd, env=env)
         return outcomes.MutationOutput.model_validate(envelope['data'])
 
@@ -141,6 +186,11 @@ class Add:
         goal: str | None = None,
         system: bool = False,
         no_sync: bool = False,
+        directory: str | None = None,
+        manifest: str | None = None,
+        instructions_dir: str | None = None,
+        rules_dir: str | None = None,
+        output_format: str | None = None,
         cwd: str | os.PathLike[str] | None = None,
         env: Mapping[str, str] | None = None,
     ) -> outcomes.MutationOutput:
@@ -171,6 +221,16 @@ class Add:
             argv.append('--system')
         if no_sync:
             argv.append('--no-sync')
+        if directory is not None:
+            argv.extend(['--directory', directory])
+        if manifest is not None:
+            argv.extend(['--manifest', manifest])
+        if instructions_dir is not None:
+            argv.extend(['--instructions-dir', instructions_dir])
+        if rules_dir is not None:
+            argv.extend(['--rules-dir', rules_dir])
+        if output_format is not None:
+            argv.extend(['--output-format', output_format])
         envelope = self._theta._run(argv, cwd=cwd, env=env)
         return outcomes.MutationOutput.model_validate(envelope['data'])
 
@@ -185,6 +245,11 @@ class Add:
         tools: str | None = None,
         skills: str | None = None,
         description_only: bool = False,
+        directory: str | None = None,
+        manifest: str | None = None,
+        instructions_dir: str | None = None,
+        rules_dir: str | None = None,
+        output_format: str | None = None,
         cwd: str | os.PathLike[str] | None = None,
         env: Mapping[str, str] | None = None,
     ) -> outcomes.MutationOutput:
@@ -205,6 +270,16 @@ class Add:
             argv.extend(['--skills', skills])
         if description_only:
             argv.append('--description-only')
+        if directory is not None:
+            argv.extend(['--directory', directory])
+        if manifest is not None:
+            argv.extend(['--manifest', manifest])
+        if instructions_dir is not None:
+            argv.extend(['--instructions-dir', instructions_dir])
+        if rules_dir is not None:
+            argv.extend(['--rules-dir', rules_dir])
+        if output_format is not None:
+            argv.extend(['--output-format', output_format])
         envelope = self._theta._run(argv, cwd=cwd, env=env)
         return outcomes.MutationOutput.model_validate(envelope['data'])
 
@@ -222,9 +297,14 @@ class Cast:
         output: str | None = None,
         force: bool = False,
         notes: bool = False,
+        directory: str | None = None,
+        manifest: str | None = None,
+        instructions_dir: str | None = None,
+        rules_dir: str | None = None,
+        output_format: str | None = None,
         cwd: str | os.PathLike[str] | None = None,
         env: Mapping[str, str] | None = None,
-    ) -> outcomes.CastToOutcome:
+    ) -> outcomes.CastToOutput:
         """Cast theta.toml to a harness-native config"""
         argv: list[str] = ['cast', 'to']
         argv.append(target)
@@ -234,8 +314,18 @@ class Cast:
             argv.append('--force')
         if notes:
             argv.append('--notes')
+        if directory is not None:
+            argv.extend(['--directory', directory])
+        if manifest is not None:
+            argv.extend(['--manifest', manifest])
+        if instructions_dir is not None:
+            argv.extend(['--instructions-dir', instructions_dir])
+        if rules_dir is not None:
+            argv.extend(['--rules-dir', rules_dir])
+        if output_format is not None:
+            argv.extend(['--output-format', output_format])
         envelope = self._theta._run(argv, cwd=cwd, env=env)
-        return outcomes.CastToOutcome.model_validate(envelope['data'])
+        return outcomes.CastToOutput.model_validate(envelope['data'])
 
     def from_(
         self,
@@ -247,9 +337,14 @@ class Cast:
         force_overwrite: bool = False,
         notes: bool = False,
         cross_read: bool = False,
+        directory: str | None = None,
+        manifest: str | None = None,
+        instructions_dir: str | None = None,
+        rules_dir: str | None = None,
+        output_format: str | None = None,
         cwd: str | os.PathLike[str] | None = None,
         env: Mapping[str, str] | None = None,
-    ) -> outcomes.CastFromOutcome:
+    ) -> outcomes.CastFromOutput:
         """Import a harness-native config into theta.toml"""
         argv: list[str] = ['cast', 'from']
         argv.append(source)
@@ -265,8 +360,18 @@ class Cast:
             argv.append('--notes')
         if cross_read:
             argv.append('--cross-read')
+        if directory is not None:
+            argv.extend(['--directory', directory])
+        if manifest is not None:
+            argv.extend(['--manifest', manifest])
+        if instructions_dir is not None:
+            argv.extend(['--instructions-dir', instructions_dir])
+        if rules_dir is not None:
+            argv.extend(['--rules-dir', rules_dir])
+        if output_format is not None:
+            argv.extend(['--output-format', output_format])
         envelope = self._theta._run(argv, cwd=cwd, env=env)
-        return outcomes.CastFromOutcome.model_validate(envelope['data'])
+        return outcomes.CastFromOutput.model_validate(envelope['data'])
 
 
 class List:
@@ -277,53 +382,133 @@ class List:
 
     def rules(
         self,
+        *,
+        directory: str | None = None,
+        manifest: str | None = None,
+        instructions_dir: str | None = None,
+        rules_dir: str | None = None,
+        output_format: str | None = None,
         cwd: str | os.PathLike[str] | None = None,
         env: Mapping[str, str] | None = None,
-    ) -> outcomes.ListOutcome:
+    ) -> outcomes.ListOutput:
         """List registered rules"""
         argv: list[str] = ['list', 'rules']
+        if directory is not None:
+            argv.extend(['--directory', directory])
+        if manifest is not None:
+            argv.extend(['--manifest', manifest])
+        if instructions_dir is not None:
+            argv.extend(['--instructions-dir', instructions_dir])
+        if rules_dir is not None:
+            argv.extend(['--rules-dir', rules_dir])
+        if output_format is not None:
+            argv.extend(['--output-format', output_format])
         envelope = self._theta._run(argv, cwd=cwd, env=env)
-        return outcomes.ListOutcome.model_validate(envelope['data'])
+        return outcomes.ListOutput.model_validate(envelope['data'])
 
     def tools(
         self,
+        *,
+        directory: str | None = None,
+        manifest: str | None = None,
+        instructions_dir: str | None = None,
+        rules_dir: str | None = None,
+        output_format: str | None = None,
         cwd: str | os.PathLike[str] | None = None,
         env: Mapping[str, str] | None = None,
-    ) -> outcomes.ListOutcome:
+    ) -> outcomes.ListOutput:
         """List registered tools (MCP servers)"""
         argv: list[str] = ['list', 'tools']
+        if directory is not None:
+            argv.extend(['--directory', directory])
+        if manifest is not None:
+            argv.extend(['--manifest', manifest])
+        if instructions_dir is not None:
+            argv.extend(['--instructions-dir', instructions_dir])
+        if rules_dir is not None:
+            argv.extend(['--rules-dir', rules_dir])
+        if output_format is not None:
+            argv.extend(['--output-format', output_format])
         envelope = self._theta._run(argv, cwd=cwd, env=env)
-        return outcomes.ListOutcome.model_validate(envelope['data'])
+        return outcomes.ListOutput.model_validate(envelope['data'])
 
     def skills(
         self,
+        *,
+        directory: str | None = None,
+        manifest: str | None = None,
+        instructions_dir: str | None = None,
+        rules_dir: str | None = None,
+        output_format: str | None = None,
         cwd: str | os.PathLike[str] | None = None,
         env: Mapping[str, str] | None = None,
-    ) -> outcomes.ListOutcome:
+    ) -> outcomes.ListOutput:
         """List registered skills"""
         argv: list[str] = ['list', 'skills']
+        if directory is not None:
+            argv.extend(['--directory', directory])
+        if manifest is not None:
+            argv.extend(['--manifest', manifest])
+        if instructions_dir is not None:
+            argv.extend(['--instructions-dir', instructions_dir])
+        if rules_dir is not None:
+            argv.extend(['--rules-dir', rules_dir])
+        if output_format is not None:
+            argv.extend(['--output-format', output_format])
         envelope = self._theta._run(argv, cwd=cwd, env=env)
-        return outcomes.ListOutcome.model_validate(envelope['data'])
+        return outcomes.ListOutput.model_validate(envelope['data'])
 
     def subagents(
         self,
+        *,
+        directory: str | None = None,
+        manifest: str | None = None,
+        instructions_dir: str | None = None,
+        rules_dir: str | None = None,
+        output_format: str | None = None,
         cwd: str | os.PathLike[str] | None = None,
         env: Mapping[str, str] | None = None,
-    ) -> outcomes.ListOutcome:
+    ) -> outcomes.ListOutput:
         """List registered subagents"""
         argv: list[str] = ['list', 'subagents']
+        if directory is not None:
+            argv.extend(['--directory', directory])
+        if manifest is not None:
+            argv.extend(['--manifest', manifest])
+        if instructions_dir is not None:
+            argv.extend(['--instructions-dir', instructions_dir])
+        if rules_dir is not None:
+            argv.extend(['--rules-dir', rules_dir])
+        if output_format is not None:
+            argv.extend(['--output-format', output_format])
         envelope = self._theta._run(argv, cwd=cwd, env=env)
-        return outcomes.ListOutcome.model_validate(envelope['data'])
+        return outcomes.ListOutput.model_validate(envelope['data'])
 
     def store(
         self,
+        *,
+        directory: str | None = None,
+        manifest: str | None = None,
+        instructions_dir: str | None = None,
+        rules_dir: str | None = None,
+        output_format: str | None = None,
         cwd: str | os.PathLike[str] | None = None,
         env: Mapping[str, str] | None = None,
-    ) -> outcomes.ListOutcome:
+    ) -> outcomes.ListOutput:
         """List contents of the system store"""
         argv: list[str] = ['list', 'store']
+        if directory is not None:
+            argv.extend(['--directory', directory])
+        if manifest is not None:
+            argv.extend(['--manifest', manifest])
+        if instructions_dir is not None:
+            argv.extend(['--instructions-dir', instructions_dir])
+        if rules_dir is not None:
+            argv.extend(['--rules-dir', rules_dir])
+        if output_format is not None:
+            argv.extend(['--output-format', output_format])
         envelope = self._theta._run(argv, cwd=cwd, env=env)
-        return outcomes.ListOutcome.model_validate(envelope['data'])
+        return outcomes.ListOutput.model_validate(envelope['data'])
 
 
 class Register:
@@ -345,6 +530,11 @@ class Register:
         subdirectory: str | None = None,
         description: str | None = None,
         force: bool = False,
+        directory: str | None = None,
+        manifest: str | None = None,
+        instructions_dir: str | None = None,
+        rules_dir: str | None = None,
+        output_format: str | None = None,
         cwd: str | os.PathLike[str] | None = None,
         env: Mapping[str, str] | None = None,
     ) -> outcomes.MutationOutput:
@@ -369,6 +559,16 @@ class Register:
             argv.extend(['--description', description])
         if force:
             argv.append('--force')
+        if directory is not None:
+            argv.extend(['--directory', directory])
+        if manifest is not None:
+            argv.extend(['--manifest', manifest])
+        if instructions_dir is not None:
+            argv.extend(['--instructions-dir', instructions_dir])
+        if rules_dir is not None:
+            argv.extend(['--rules-dir', rules_dir])
+        if output_format is not None:
+            argv.extend(['--output-format', output_format])
         envelope = self._theta._run(argv, cwd=cwd, env=env)
         return outcomes.MutationOutput.model_validate(envelope['data'])
 
@@ -377,6 +577,11 @@ class Register:
         name: str,
         *,
         force: bool = False,
+        directory: str | None = None,
+        manifest: str | None = None,
+        instructions_dir: str | None = None,
+        rules_dir: str | None = None,
+        output_format: str | None = None,
         cwd: str | os.PathLike[str] | None = None,
         env: Mapping[str, str] | None = None,
     ) -> outcomes.MutationOutput:
@@ -385,6 +590,16 @@ class Register:
         argv.append(name)
         if force:
             argv.append('--force')
+        if directory is not None:
+            argv.extend(['--directory', directory])
+        if manifest is not None:
+            argv.extend(['--manifest', manifest])
+        if instructions_dir is not None:
+            argv.extend(['--instructions-dir', instructions_dir])
+        if rules_dir is not None:
+            argv.extend(['--rules-dir', rules_dir])
+        if output_format is not None:
+            argv.extend(['--output-format', output_format])
         envelope = self._theta._run(argv, cwd=cwd, env=env)
         return outcomes.MutationOutput.model_validate(envelope['data'])
 
@@ -394,6 +609,11 @@ class Register:
         name: str | None = None,
         force: bool = False,
         no_lock: bool = False,
+        directory: str | None = None,
+        manifest: str | None = None,
+        instructions_dir: str | None = None,
+        rules_dir: str | None = None,
+        output_format: str | None = None,
         cwd: str | os.PathLike[str] | None = None,
         env: Mapping[str, str] | None = None,
     ) -> outcomes.MutationOutput:
@@ -405,6 +625,16 @@ class Register:
             argv.append('--force')
         if no_lock:
             argv.append('--no-lock')
+        if directory is not None:
+            argv.extend(['--directory', directory])
+        if manifest is not None:
+            argv.extend(['--manifest', manifest])
+        if instructions_dir is not None:
+            argv.extend(['--instructions-dir', instructions_dir])
+        if rules_dir is not None:
+            argv.extend(['--rules-dir', rules_dir])
+        if output_format is not None:
+            argv.extend(['--output-format', output_format])
         envelope = self._theta._run(argv, cwd=cwd, env=env)
         return outcomes.MutationOutput.model_validate(envelope['data'])
 
@@ -421,6 +651,11 @@ class Rm:
         *,
         delete: bool = False,
         no_sync: bool = False,
+        directory: str | None = None,
+        manifest: str | None = None,
+        instructions_dir: str | None = None,
+        rules_dir: str | None = None,
+        output_format: str | None = None,
         cwd: str | os.PathLike[str] | None = None,
         env: Mapping[str, str] | None = None,
     ) -> outcomes.MutationOutput:
@@ -431,6 +666,16 @@ class Rm:
             argv.append('--delete')
         if no_sync:
             argv.append('--no-sync')
+        if directory is not None:
+            argv.extend(['--directory', directory])
+        if manifest is not None:
+            argv.extend(['--manifest', manifest])
+        if instructions_dir is not None:
+            argv.extend(['--instructions-dir', instructions_dir])
+        if rules_dir is not None:
+            argv.extend(['--rules-dir', rules_dir])
+        if output_format is not None:
+            argv.extend(['--output-format', output_format])
         envelope = self._theta._run(argv, cwd=cwd, env=env)
         return outcomes.MutationOutput.model_validate(envelope['data'])
 
@@ -439,6 +684,11 @@ class Rm:
         *,
         delete: bool = False,
         no_sync: bool = False,
+        directory: str | None = None,
+        manifest: str | None = None,
+        instructions_dir: str | None = None,
+        rules_dir: str | None = None,
+        output_format: str | None = None,
         cwd: str | os.PathLike[str] | None = None,
         env: Mapping[str, str] | None = None,
     ) -> outcomes.MutationOutput:
@@ -448,18 +698,44 @@ class Rm:
             argv.append('--delete')
         if no_sync:
             argv.append('--no-sync')
+        if directory is not None:
+            argv.extend(['--directory', directory])
+        if manifest is not None:
+            argv.extend(['--manifest', manifest])
+        if instructions_dir is not None:
+            argv.extend(['--instructions-dir', instructions_dir])
+        if rules_dir is not None:
+            argv.extend(['--rules-dir', rules_dir])
+        if output_format is not None:
+            argv.extend(['--output-format', output_format])
         envelope = self._theta._run(argv, cwd=cwd, env=env)
         return outcomes.MutationOutput.model_validate(envelope['data'])
 
     def tool(
         self,
         name: str,
+        *,
+        directory: str | None = None,
+        manifest: str | None = None,
+        instructions_dir: str | None = None,
+        rules_dir: str | None = None,
+        output_format: str | None = None,
         cwd: str | os.PathLike[str] | None = None,
         env: Mapping[str, str] | None = None,
     ) -> outcomes.MutationOutput:
         """Remove a tool from the manifest"""
         argv: list[str] = ['rm', 'tool']
         argv.append(name)
+        if directory is not None:
+            argv.extend(['--directory', directory])
+        if manifest is not None:
+            argv.extend(['--manifest', manifest])
+        if instructions_dir is not None:
+            argv.extend(['--instructions-dir', instructions_dir])
+        if rules_dir is not None:
+            argv.extend(['--rules-dir', rules_dir])
+        if output_format is not None:
+            argv.extend(['--output-format', output_format])
         envelope = self._theta._run(argv, cwd=cwd, env=env)
         return outcomes.MutationOutput.model_validate(envelope['data'])
 
@@ -469,6 +745,11 @@ class Rm:
         *,
         delete: bool = False,
         no_sync: bool = False,
+        directory: str | None = None,
+        manifest: str | None = None,
+        instructions_dir: str | None = None,
+        rules_dir: str | None = None,
+        output_format: str | None = None,
         cwd: str | os.PathLike[str] | None = None,
         env: Mapping[str, str] | None = None,
     ) -> outcomes.MutationOutput:
@@ -479,6 +760,16 @@ class Rm:
             argv.append('--delete')
         if no_sync:
             argv.append('--no-sync')
+        if directory is not None:
+            argv.extend(['--directory', directory])
+        if manifest is not None:
+            argv.extend(['--manifest', manifest])
+        if instructions_dir is not None:
+            argv.extend(['--instructions-dir', instructions_dir])
+        if rules_dir is not None:
+            argv.extend(['--rules-dir', rules_dir])
+        if output_format is not None:
+            argv.extend(['--output-format', output_format])
         envelope = self._theta._run(argv, cwd=cwd, env=env)
         return outcomes.MutationOutput.model_validate(envelope['data'])
 
@@ -488,6 +779,11 @@ class Rm:
         *,
         delete: bool = False,
         no_sync: bool = False,
+        directory: str | None = None,
+        manifest: str | None = None,
+        instructions_dir: str | None = None,
+        rules_dir: str | None = None,
+        output_format: str | None = None,
         cwd: str | os.PathLike[str] | None = None,
         env: Mapping[str, str] | None = None,
     ) -> outcomes.MutationOutput:
@@ -498,6 +794,16 @@ class Rm:
             argv.append('--delete')
         if no_sync:
             argv.append('--no-sync')
+        if directory is not None:
+            argv.extend(['--directory', directory])
+        if manifest is not None:
+            argv.extend(['--manifest', manifest])
+        if instructions_dir is not None:
+            argv.extend(['--instructions-dir', instructions_dir])
+        if rules_dir is not None:
+            argv.extend(['--rules-dir', rules_dir])
+        if output_format is not None:
+            argv.extend(['--output-format', output_format])
         envelope = self._theta._run(argv, cwd=cwd, env=env)
         return outcomes.MutationOutput.model_validate(envelope['data'])
 
@@ -505,6 +811,12 @@ class Rm:
         self,
         kind: str,
         name: str,
+        *,
+        directory: str | None = None,
+        manifest: str | None = None,
+        instructions_dir: str | None = None,
+        rules_dir: str | None = None,
+        output_format: str | None = None,
         cwd: str | os.PathLike[str] | None = None,
         env: Mapping[str, str] | None = None,
     ) -> outcomes.MutationOutput:
@@ -512,6 +824,16 @@ class Rm:
         argv: list[str] = ['rm', 'store']
         argv.append(kind)
         argv.append(name)
+        if directory is not None:
+            argv.extend(['--directory', directory])
+        if manifest is not None:
+            argv.extend(['--manifest', manifest])
+        if instructions_dir is not None:
+            argv.extend(['--instructions-dir', instructions_dir])
+        if rules_dir is not None:
+            argv.extend(['--rules-dir', rules_dir])
+        if output_format is not None:
+            argv.extend(['--output-format', output_format])
         envelope = self._theta._run(argv, cwd=cwd, env=env)
         return outcomes.MutationOutput.model_validate(envelope['data'])
 
@@ -522,10 +844,12 @@ class Theta:
         *,
         binary: str | os.PathLike[str] | None = None,
         cwd: str | os.PathLike[str] | None = None,
+        manifest: str | os.PathLike[str] | None = None,
         env: Mapping[str, str] | None = None,
     ) -> None:
         self._binary: Path = Path(binary) if binary is not None else runner._resolve_binary()
         self._cwd = cwd
+        self._manifest = Path(manifest) if manifest is not None else None
         self._env = env
         self.add = Add(self)
         self.cast = Cast(self)
@@ -550,7 +874,10 @@ class Theta:
         else:
             effective_cwd = os.getcwd()
         effective_env = env if env is not None else self._env
-        return runner.run_with_binary(self._binary, argv, cwd=effective_cwd, env=effective_env)
+        effective_argv = argv
+        if self._manifest is not None and '--manifest' not in argv:
+            effective_argv = ['--manifest', str(self._manifest), *argv]
+        return runner.run_with_binary(self._binary, effective_argv, cwd=effective_cwd, env=effective_env)
 
     def init(
         self,
@@ -558,9 +885,14 @@ class Theta:
         from_: str | None = None,
         name: str | None = None,
         force: bool = False,
+        directory: str | None = None,
+        manifest: str | None = None,
+        instructions_dir: str | None = None,
+        rules_dir: str | None = None,
+        output_format: str | None = None,
         cwd: str | os.PathLike[str] | None = None,
         env: Mapping[str, str] | None = None,
-    ) -> outcomes.InitOutcome:
+    ) -> outcomes.InitOutput:
         """Scaffold a new theta.toml in the current directory"""
         argv: list[str] = ['init']
         if from_ is not None:
@@ -569,25 +901,50 @@ class Theta:
             argv.extend(['--name', name])
         if force:
             argv.append('--force')
+        if directory is not None:
+            argv.extend(['--directory', directory])
+        if manifest is not None:
+            argv.extend(['--manifest', manifest])
+        if instructions_dir is not None:
+            argv.extend(['--instructions-dir', instructions_dir])
+        if rules_dir is not None:
+            argv.extend(['--rules-dir', rules_dir])
+        if output_format is not None:
+            argv.extend(['--output-format', output_format])
         envelope = self._run(argv, cwd=cwd, env=env)
-        return outcomes.InitOutcome.model_validate(envelope['data'])
+        return outcomes.InitOutput.model_validate(envelope['data'])
 
     def check(
         self,
         *,
         schema_only: bool = False,
         skip_materialization: bool = False,
+        directory: str | None = None,
+        manifest: str | None = None,
+        instructions_dir: str | None = None,
+        rules_dir: str | None = None,
+        output_format: str | None = None,
         cwd: str | os.PathLike[str] | None = None,
         env: Mapping[str, str] | None = None,
-    ) -> outcomes.CheckOutcome:
+    ) -> outcomes.CheckReport:
         """Validate theta.toml and materialized dependencies"""
         argv: list[str] = ['check']
         if schema_only:
             argv.append('--schema-only')
         if skip_materialization:
             argv.append('--skip-materialization')
+        if directory is not None:
+            argv.extend(['--directory', directory])
+        if manifest is not None:
+            argv.extend(['--manifest', manifest])
+        if instructions_dir is not None:
+            argv.extend(['--instructions-dir', instructions_dir])
+        if rules_dir is not None:
+            argv.extend(['--rules-dir', rules_dir])
+        if output_format is not None:
+            argv.extend(['--output-format', output_format])
         envelope = self._run(argv, cwd=cwd, env=env)
-        return outcomes.CheckOutcome.model_validate(envelope['data'])
+        return outcomes.CheckReport.model_validate(envelope['data'])
 
     def describe(
         self,
@@ -595,9 +952,14 @@ class Theta:
         *,
         set: str | None = None,
         rules: bool = False,
+        directory: str | None = None,
+        manifest: str | None = None,
+        instructions_dir: str | None = None,
+        rules_dir: str | None = None,
+        output_format: str | None = None,
         cwd: str | os.PathLike[str] | None = None,
         env: Mapping[str, str] | None = None,
-    ) -> outcomes.DescribeOutcome:
+    ) -> outcomes.DescribeOutput:
         """Read or set the agent description"""
         argv: list[str] = ['describe']
         if description is not None:
@@ -606,46 +968,128 @@ class Theta:
             argv.extend(['--set', set])
         if rules:
             argv.append('--rules')
+        if directory is not None:
+            argv.extend(['--directory', directory])
+        if manifest is not None:
+            argv.extend(['--manifest', manifest])
+        if instructions_dir is not None:
+            argv.extend(['--instructions-dir', instructions_dir])
+        if rules_dir is not None:
+            argv.extend(['--rules-dir', rules_dir])
+        if output_format is not None:
+            argv.extend(['--output-format', output_format])
         envelope = self._run(argv, cwd=cwd, env=env)
-        return outcomes.DescribeOutcome.model_validate(envelope['data'])
+        return outcomes.DescribeOutput.model_validate(envelope['data'])
 
     def lock(
         self,
         *,
         force: bool = False,
+        directory: str | None = None,
+        manifest: str | None = None,
+        instructions_dir: str | None = None,
+        rules_dir: str | None = None,
+        output_format: str | None = None,
         cwd: str | os.PathLike[str] | None = None,
         env: Mapping[str, str] | None = None,
-    ) -> outcomes.LockOutcome:
+    ) -> outcomes.LockOutput:
         """Resolve all sources and write theta.lock"""
         argv: list[str] = ['lock']
         if force:
             argv.append('--force')
+        if directory is not None:
+            argv.extend(['--directory', directory])
+        if manifest is not None:
+            argv.extend(['--manifest', manifest])
+        if instructions_dir is not None:
+            argv.extend(['--instructions-dir', instructions_dir])
+        if rules_dir is not None:
+            argv.extend(['--rules-dir', rules_dir])
+        if output_format is not None:
+            argv.extend(['--output-format', output_format])
         envelope = self._run(argv, cwd=cwd, env=env)
-        return outcomes.LockOutcome.model_validate(envelope['data'])
+        return outcomes.LockOutput.model_validate(envelope['data'])
 
     def sync(
         self,
         *,
         force: bool = False,
+        directory: str | None = None,
+        manifest: str | None = None,
+        instructions_dir: str | None = None,
+        rules_dir: str | None = None,
+        output_format: str | None = None,
         cwd: str | os.PathLike[str] | None = None,
         env: Mapping[str, str] | None = None,
-    ) -> outcomes.SyncOutcome:
+    ) -> outcomes.SyncOutput:
         """Materialize dependencies into .theta/"""
         argv: list[str] = ['sync']
         if force:
             argv.append('--force')
+        if directory is not None:
+            argv.extend(['--directory', directory])
+        if manifest is not None:
+            argv.extend(['--manifest', manifest])
+        if instructions_dir is not None:
+            argv.extend(['--instructions-dir', instructions_dir])
+        if rules_dir is not None:
+            argv.extend(['--rules-dir', rules_dir])
+        if output_format is not None:
+            argv.extend(['--output-format', output_format])
         envelope = self._run(argv, cwd=cwd, env=env)
-        return outcomes.SyncOutcome.model_validate(envelope['data'])
+        return outcomes.SyncOutput.model_validate(envelope['data'])
 
     def tree(
         self,
+        *,
+        directory: str | None = None,
+        manifest: str | None = None,
+        instructions_dir: str | None = None,
+        rules_dir: str | None = None,
+        output_format: str | None = None,
         cwd: str | os.PathLike[str] | None = None,
         env: Mapping[str, str] | None = None,
-    ) -> outcomes.TreeOutcome:
+    ) -> outcomes.TreeOutput:
         """Print the subagent dependency tree"""
         argv: list[str] = ['tree']
+        if directory is not None:
+            argv.extend(['--directory', directory])
+        if manifest is not None:
+            argv.extend(['--manifest', manifest])
+        if instructions_dir is not None:
+            argv.extend(['--instructions-dir', instructions_dir])
+        if rules_dir is not None:
+            argv.extend(['--rules-dir', rules_dir])
+        if output_format is not None:
+            argv.extend(['--output-format', output_format])
         envelope = self._run(argv, cwd=cwd, env=env)
-        return outcomes.TreeOutcome.model_validate(envelope['data'])
+        return outcomes.TreeOutput.model_validate(envelope['data'])
+
+    def get(
+        self,
+        *,
+        directory: str | None = None,
+        manifest: str | None = None,
+        instructions_dir: str | None = None,
+        rules_dir: str | None = None,
+        output_format: str | None = None,
+        cwd: str | os.PathLike[str] | None = None,
+        env: Mapping[str, str] | None = None,
+    ) -> outcomes.ProjectSnapshot:
+        """Emit all materialized project content as JSON (requires theta sync first)"""
+        argv: list[str] = ['get']
+        if directory is not None:
+            argv.extend(['--directory', directory])
+        if manifest is not None:
+            argv.extend(['--manifest', manifest])
+        if instructions_dir is not None:
+            argv.extend(['--instructions-dir', instructions_dir])
+        if rules_dir is not None:
+            argv.extend(['--rules-dir', rules_dir])
+        if output_format is not None:
+            argv.extend(['--output-format', output_format])
+        envelope = self._run(argv, cwd=cwd, env=env)
+        return outcomes.ProjectSnapshot.model_validate(envelope['data'])
 
 
 _theta: Theta | None = None
@@ -663,22 +1107,32 @@ def init(
     from_: str | None = None,
     name: str | None = None,
     force: bool = False,
+    directory: str | None = None,
+    manifest: str | None = None,
+    instructions_dir: str | None = None,
+    rules_dir: str | None = None,
+    output_format: str | None = None,
     cwd: str | os.PathLike[str] | None = None,
     env: Mapping[str, str] | None = None,
-) -> outcomes.InitOutcome:
+) -> outcomes.InitOutput:
     """Scaffold a new theta.toml in the current directory"""
-    return _get_theta().init(from_=from_, name=name, force=force, cwd=cwd, env=env)
+    return _get_theta().init(from_=from_, name=name, force=force, directory=directory, manifest=manifest, instructions_dir=instructions_dir, rules_dir=rules_dir, output_format=output_format, cwd=cwd, env=env)
 
 
 def check(
     *,
     schema_only: bool = False,
     skip_materialization: bool = False,
+    directory: str | None = None,
+    manifest: str | None = None,
+    instructions_dir: str | None = None,
+    rules_dir: str | None = None,
+    output_format: str | None = None,
     cwd: str | os.PathLike[str] | None = None,
     env: Mapping[str, str] | None = None,
-) -> outcomes.CheckOutcome:
+) -> outcomes.CheckReport:
     """Validate theta.toml and materialized dependencies"""
-    return _get_theta().check(schema_only=schema_only, skip_materialization=skip_materialization, cwd=cwd, env=env)
+    return _get_theta().check(schema_only=schema_only, skip_materialization=skip_materialization, directory=directory, manifest=manifest, instructions_dir=instructions_dir, rules_dir=rules_dir, output_format=output_format, cwd=cwd, env=env)
 
 
 def describe(
@@ -686,39 +1140,74 @@ def describe(
     *,
     set: str | None = None,
     rules: bool = False,
+    directory: str | None = None,
+    manifest: str | None = None,
+    instructions_dir: str | None = None,
+    rules_dir: str | None = None,
+    output_format: str | None = None,
     cwd: str | os.PathLike[str] | None = None,
     env: Mapping[str, str] | None = None,
-) -> outcomes.DescribeOutcome:
+) -> outcomes.DescribeOutput:
     """Read or set the agent description"""
-    return _get_theta().describe(description, set=set, rules=rules, cwd=cwd, env=env)
+    return _get_theta().describe(description, set=set, rules=rules, directory=directory, manifest=manifest, instructions_dir=instructions_dir, rules_dir=rules_dir, output_format=output_format, cwd=cwd, env=env)
 
 
 def lock(
     *,
     force: bool = False,
+    directory: str | None = None,
+    manifest: str | None = None,
+    instructions_dir: str | None = None,
+    rules_dir: str | None = None,
+    output_format: str | None = None,
     cwd: str | os.PathLike[str] | None = None,
     env: Mapping[str, str] | None = None,
-) -> outcomes.LockOutcome:
+) -> outcomes.LockOutput:
     """Resolve all sources and write theta.lock"""
-    return _get_theta().lock(force=force, cwd=cwd, env=env)
+    return _get_theta().lock(force=force, directory=directory, manifest=manifest, instructions_dir=instructions_dir, rules_dir=rules_dir, output_format=output_format, cwd=cwd, env=env)
 
 
 def sync(
     *,
     force: bool = False,
+    directory: str | None = None,
+    manifest: str | None = None,
+    instructions_dir: str | None = None,
+    rules_dir: str | None = None,
+    output_format: str | None = None,
     cwd: str | os.PathLike[str] | None = None,
     env: Mapping[str, str] | None = None,
-) -> outcomes.SyncOutcome:
+) -> outcomes.SyncOutput:
     """Materialize dependencies into .theta/"""
-    return _get_theta().sync(force=force, cwd=cwd, env=env)
+    return _get_theta().sync(force=force, directory=directory, manifest=manifest, instructions_dir=instructions_dir, rules_dir=rules_dir, output_format=output_format, cwd=cwd, env=env)
 
 
 def tree(
+    *,
+    directory: str | None = None,
+    manifest: str | None = None,
+    instructions_dir: str | None = None,
+    rules_dir: str | None = None,
+    output_format: str | None = None,
     cwd: str | os.PathLike[str] | None = None,
     env: Mapping[str, str] | None = None,
-) -> outcomes.TreeOutcome:
+) -> outcomes.TreeOutput:
     """Print the subagent dependency tree"""
-    return _get_theta().tree(cwd=cwd, env=env)
+    return _get_theta().tree(directory=directory, manifest=manifest, instructions_dir=instructions_dir, rules_dir=rules_dir, output_format=output_format, cwd=cwd, env=env)
+
+
+def get(
+    *,
+    directory: str | None = None,
+    manifest: str | None = None,
+    instructions_dir: str | None = None,
+    rules_dir: str | None = None,
+    output_format: str | None = None,
+    cwd: str | os.PathLike[str] | None = None,
+    env: Mapping[str, str] | None = None,
+) -> outcomes.ProjectSnapshot:
+    """Emit all materialized project content as JSON (requires theta sync first)"""
+    return _get_theta().get(directory=directory, manifest=manifest, instructions_dir=instructions_dir, rules_dir=rules_dir, output_format=output_format, cwd=cwd, env=env)
 
 
 def add_rule(
@@ -737,22 +1226,32 @@ def add_rule(
     apply: str | None = None,
     apply_to: str | None = None,
     description: str | None = None,
+    directory: str | None = None,
+    manifest: str | None = None,
+    instructions_dir: str | None = None,
+    rules_dir: str | None = None,
+    output_format: str | None = None,
     cwd: str | os.PathLike[str] | None = None,
     env: Mapping[str, str] | None = None,
 ) -> outcomes.MutationOutput:
     """Scaffold and register a new rule"""
-    return _get_theta().add.rule(name, system=system, path=path, git=git, branch=branch, tag=tag, rev=rev, file=file, sync=sync, content=content, summary=summary, apply=apply, apply_to=apply_to, description=description, cwd=cwd, env=env)
+    return _get_theta().add.rule(name, system=system, path=path, git=git, branch=branch, tag=tag, rev=rev, file=file, sync=sync, content=content, summary=summary, apply=apply, apply_to=apply_to, description=description, directory=directory, manifest=manifest, instructions_dir=instructions_dir, rules_dir=rules_dir, output_format=output_format, cwd=cwd, env=env)
 
 
 def add_system(
     *,
     path: str | None = None,
     content: str | None = None,
+    directory: str | None = None,
+    manifest: str | None = None,
+    instructions_dir: str | None = None,
+    rules_dir: str | None = None,
+    output_format: str | None = None,
     cwd: str | os.PathLike[str] | None = None,
     env: Mapping[str, str] | None = None,
 ) -> outcomes.MutationOutput:
     """Scaffold and register the system prompt"""
-    return _get_theta().add.system(path=path, content=content, cwd=cwd, env=env)
+    return _get_theta().add.system(path=path, content=content, directory=directory, manifest=manifest, instructions_dir=instructions_dir, rules_dir=rules_dir, output_format=output_format, cwd=cwd, env=env)
 
 
 def add_tool(
@@ -766,11 +1265,16 @@ def add_tool(
     disabled: bool = False,
     registry: str | None = None,
     no_cache: bool = False,
+    directory: str | None = None,
+    manifest: str | None = None,
+    instructions_dir: str | None = None,
+    rules_dir: str | None = None,
+    output_format: str | None = None,
     cwd: str | os.PathLike[str] | None = None,
     env: Mapping[str, str] | None = None,
 ) -> outcomes.MutationOutput:
     """Register an MCP tool (stdio or HTTP)"""
-    return _get_theta().add.tool(name, command=command, url=url, envs=envs, headers=headers, extra_args=extra_args, disabled=disabled, registry=registry, no_cache=no_cache, cwd=cwd, env=env)
+    return _get_theta().add.tool(name, command=command, url=url, envs=envs, headers=headers, extra_args=extra_args, disabled=disabled, registry=registry, no_cache=no_cache, directory=directory, manifest=manifest, instructions_dir=instructions_dir, rules_dir=rules_dir, output_format=output_format, cwd=cwd, env=env)
 
 
 def add_skill(
@@ -788,11 +1292,16 @@ def add_skill(
     goal: str | None = None,
     system: bool = False,
     no_sync: bool = False,
+    directory: str | None = None,
+    manifest: str | None = None,
+    instructions_dir: str | None = None,
+    rules_dir: str | None = None,
+    output_format: str | None = None,
     cwd: str | os.PathLike[str] | None = None,
     env: Mapping[str, str] | None = None,
 ) -> outcomes.MutationOutput:
     """Scaffold or register a skill"""
-    return _get_theta().add.skill(name_or_ref, name=name, path=path, git=git, branch=branch, tag=tag, rev=rev, subdirectory=subdirectory, description=description, tags=tags, goal=goal, system=system, no_sync=no_sync, cwd=cwd, env=env)
+    return _get_theta().add.skill(name_or_ref, name=name, path=path, git=git, branch=branch, tag=tag, rev=rev, subdirectory=subdirectory, description=description, tags=tags, goal=goal, system=system, no_sync=no_sync, directory=directory, manifest=manifest, instructions_dir=instructions_dir, rules_dir=rules_dir, output_format=output_format, cwd=cwd, env=env)
 
 
 def add_subagent(
@@ -805,11 +1314,16 @@ def add_subagent(
     tools: str | None = None,
     skills: str | None = None,
     description_only: bool = False,
+    directory: str | None = None,
+    manifest: str | None = None,
+    instructions_dir: str | None = None,
+    rules_dir: str | None = None,
+    output_format: str | None = None,
     cwd: str | os.PathLike[str] | None = None,
     env: Mapping[str, str] | None = None,
 ) -> outcomes.MutationOutput:
     """Register a subagent (inline or ref)"""
-    return _get_theta().add.subagent(name, agent_ref=agent_ref, description=description, model=model, prompt_path=prompt_path, tools=tools, skills=skills, description_only=description_only, cwd=cwd, env=env)
+    return _get_theta().add.subagent(name, agent_ref=agent_ref, description=description, model=model, prompt_path=prompt_path, tools=tools, skills=skills, description_only=description_only, directory=directory, manifest=manifest, instructions_dir=instructions_dir, rules_dir=rules_dir, output_format=output_format, cwd=cwd, env=env)
 
 
 def cast_to(
@@ -818,11 +1332,16 @@ def cast_to(
     output: str | None = None,
     force: bool = False,
     notes: bool = False,
+    directory: str | None = None,
+    manifest: str | None = None,
+    instructions_dir: str | None = None,
+    rules_dir: str | None = None,
+    output_format: str | None = None,
     cwd: str | os.PathLike[str] | None = None,
     env: Mapping[str, str] | None = None,
-) -> outcomes.CastToOutcome:
+) -> outcomes.CastToOutput:
     """Cast theta.toml to a harness-native config"""
-    return _get_theta().cast.to(target, output=output, force=force, notes=notes, cwd=cwd, env=env)
+    return _get_theta().cast.to(target, output=output, force=force, notes=notes, directory=directory, manifest=manifest, instructions_dir=instructions_dir, rules_dir=rules_dir, output_format=output_format, cwd=cwd, env=env)
 
 
 def cast_from(
@@ -834,51 +1353,86 @@ def cast_from(
     force_overwrite: bool = False,
     notes: bool = False,
     cross_read: bool = False,
+    directory: str | None = None,
+    manifest: str | None = None,
+    instructions_dir: str | None = None,
+    rules_dir: str | None = None,
+    output_format: str | None = None,
     cwd: str | os.PathLike[str] | None = None,
     env: Mapping[str, str] | None = None,
-) -> outcomes.CastFromOutcome:
+) -> outcomes.CastFromOutput:
     """Import a harness-native config into theta.toml"""
-    return _get_theta().cast.from_(source, input=input, force=force, subagent_prompts=subagent_prompts, force_overwrite=force_overwrite, notes=notes, cross_read=cross_read, cwd=cwd, env=env)
+    return _get_theta().cast.from_(source, input=input, force=force, subagent_prompts=subagent_prompts, force_overwrite=force_overwrite, notes=notes, cross_read=cross_read, directory=directory, manifest=manifest, instructions_dir=instructions_dir, rules_dir=rules_dir, output_format=output_format, cwd=cwd, env=env)
 
 
 def list_rules(
+    *,
+    directory: str | None = None,
+    manifest: str | None = None,
+    instructions_dir: str | None = None,
+    rules_dir: str | None = None,
+    output_format: str | None = None,
     cwd: str | os.PathLike[str] | None = None,
     env: Mapping[str, str] | None = None,
-) -> outcomes.ListOutcome:
+) -> outcomes.ListOutput:
     """List registered rules"""
-    return _get_theta().list.rules(cwd=cwd, env=env)
+    return _get_theta().list.rules(directory=directory, manifest=manifest, instructions_dir=instructions_dir, rules_dir=rules_dir, output_format=output_format, cwd=cwd, env=env)
 
 
 def list_tools(
+    *,
+    directory: str | None = None,
+    manifest: str | None = None,
+    instructions_dir: str | None = None,
+    rules_dir: str | None = None,
+    output_format: str | None = None,
     cwd: str | os.PathLike[str] | None = None,
     env: Mapping[str, str] | None = None,
-) -> outcomes.ListOutcome:
+) -> outcomes.ListOutput:
     """List registered tools (MCP servers)"""
-    return _get_theta().list.tools(cwd=cwd, env=env)
+    return _get_theta().list.tools(directory=directory, manifest=manifest, instructions_dir=instructions_dir, rules_dir=rules_dir, output_format=output_format, cwd=cwd, env=env)
 
 
 def list_skills(
+    *,
+    directory: str | None = None,
+    manifest: str | None = None,
+    instructions_dir: str | None = None,
+    rules_dir: str | None = None,
+    output_format: str | None = None,
     cwd: str | os.PathLike[str] | None = None,
     env: Mapping[str, str] | None = None,
-) -> outcomes.ListOutcome:
+) -> outcomes.ListOutput:
     """List registered skills"""
-    return _get_theta().list.skills(cwd=cwd, env=env)
+    return _get_theta().list.skills(directory=directory, manifest=manifest, instructions_dir=instructions_dir, rules_dir=rules_dir, output_format=output_format, cwd=cwd, env=env)
 
 
 def list_subagents(
+    *,
+    directory: str | None = None,
+    manifest: str | None = None,
+    instructions_dir: str | None = None,
+    rules_dir: str | None = None,
+    output_format: str | None = None,
     cwd: str | os.PathLike[str] | None = None,
     env: Mapping[str, str] | None = None,
-) -> outcomes.ListOutcome:
+) -> outcomes.ListOutput:
     """List registered subagents"""
-    return _get_theta().list.subagents(cwd=cwd, env=env)
+    return _get_theta().list.subagents(directory=directory, manifest=manifest, instructions_dir=instructions_dir, rules_dir=rules_dir, output_format=output_format, cwd=cwd, env=env)
 
 
 def list_store(
+    *,
+    directory: str | None = None,
+    manifest: str | None = None,
+    instructions_dir: str | None = None,
+    rules_dir: str | None = None,
+    output_format: str | None = None,
     cwd: str | os.PathLike[str] | None = None,
     env: Mapping[str, str] | None = None,
-) -> outcomes.ListOutcome:
+) -> outcomes.ListOutput:
     """List contents of the system store"""
-    return _get_theta().list.store(cwd=cwd, env=env)
+    return _get_theta().list.store(directory=directory, manifest=manifest, instructions_dir=instructions_dir, rules_dir=rules_dir, output_format=output_format, cwd=cwd, env=env)
 
 
 def register_skill(
@@ -893,22 +1447,32 @@ def register_skill(
     subdirectory: str | None = None,
     description: str | None = None,
     force: bool = False,
+    directory: str | None = None,
+    manifest: str | None = None,
+    instructions_dir: str | None = None,
+    rules_dir: str | None = None,
+    output_format: str | None = None,
     cwd: str | os.PathLike[str] | None = None,
     env: Mapping[str, str] | None = None,
 ) -> outcomes.MutationOutput:
     """Register a skill into the system store"""
-    return _get_theta().register.skill(name_or_ref, name=name, path=path, git=git, branch=branch, tag=tag, rev=rev, subdirectory=subdirectory, description=description, force=force, cwd=cwd, env=env)
+    return _get_theta().register.skill(name_or_ref, name=name, path=path, git=git, branch=branch, tag=tag, rev=rev, subdirectory=subdirectory, description=description, force=force, directory=directory, manifest=manifest, instructions_dir=instructions_dir, rules_dir=rules_dir, output_format=output_format, cwd=cwd, env=env)
 
 
 def register_rule(
     name: str,
     *,
     force: bool = False,
+    directory: str | None = None,
+    manifest: str | None = None,
+    instructions_dir: str | None = None,
+    rules_dir: str | None = None,
+    output_format: str | None = None,
     cwd: str | os.PathLike[str] | None = None,
     env: Mapping[str, str] | None = None,
 ) -> outcomes.MutationOutput:
     """Register a rule into the system store"""
-    return _get_theta().register.rule(name, force=force, cwd=cwd, env=env)
+    return _get_theta().register.rule(name, force=force, directory=directory, manifest=manifest, instructions_dir=instructions_dir, rules_dir=rules_dir, output_format=output_format, cwd=cwd, env=env)
 
 
 def register_agent(
@@ -916,11 +1480,16 @@ def register_agent(
     name: str | None = None,
     force: bool = False,
     no_lock: bool = False,
+    directory: str | None = None,
+    manifest: str | None = None,
+    instructions_dir: str | None = None,
+    rules_dir: str | None = None,
+    output_format: str | None = None,
     cwd: str | os.PathLike[str] | None = None,
     env: Mapping[str, str] | None = None,
 ) -> outcomes.MutationOutput:
     """Register this agent into the system store"""
-    return _get_theta().register.agent(name=name, force=force, no_lock=no_lock, cwd=cwd, env=env)
+    return _get_theta().register.agent(name=name, force=force, no_lock=no_lock, directory=directory, manifest=manifest, instructions_dir=instructions_dir, rules_dir=rules_dir, output_format=output_format, cwd=cwd, env=env)
 
 
 def rm_rule(
@@ -928,31 +1497,47 @@ def rm_rule(
     *,
     delete: bool = False,
     no_sync: bool = False,
+    directory: str | None = None,
+    manifest: str | None = None,
+    instructions_dir: str | None = None,
+    rules_dir: str | None = None,
+    output_format: str | None = None,
     cwd: str | os.PathLike[str] | None = None,
     env: Mapping[str, str] | None = None,
 ) -> outcomes.MutationOutput:
     """Remove a rule from the manifest"""
-    return _get_theta().rm.rule(name, delete=delete, no_sync=no_sync, cwd=cwd, env=env)
+    return _get_theta().rm.rule(name, delete=delete, no_sync=no_sync, directory=directory, manifest=manifest, instructions_dir=instructions_dir, rules_dir=rules_dir, output_format=output_format, cwd=cwd, env=env)
 
 
 def rm_system(
     *,
     delete: bool = False,
     no_sync: bool = False,
+    directory: str | None = None,
+    manifest: str | None = None,
+    instructions_dir: str | None = None,
+    rules_dir: str | None = None,
+    output_format: str | None = None,
     cwd: str | os.PathLike[str] | None = None,
     env: Mapping[str, str] | None = None,
 ) -> outcomes.MutationOutput:
     """Remove the system prompt from the manifest"""
-    return _get_theta().rm.system(delete=delete, no_sync=no_sync, cwd=cwd, env=env)
+    return _get_theta().rm.system(delete=delete, no_sync=no_sync, directory=directory, manifest=manifest, instructions_dir=instructions_dir, rules_dir=rules_dir, output_format=output_format, cwd=cwd, env=env)
 
 
 def rm_tool(
     name: str,
+    *,
+    directory: str | None = None,
+    manifest: str | None = None,
+    instructions_dir: str | None = None,
+    rules_dir: str | None = None,
+    output_format: str | None = None,
     cwd: str | os.PathLike[str] | None = None,
     env: Mapping[str, str] | None = None,
 ) -> outcomes.MutationOutput:
     """Remove a tool from the manifest"""
-    return _get_theta().rm.tool(name, cwd=cwd, env=env)
+    return _get_theta().rm.tool(name, directory=directory, manifest=manifest, instructions_dir=instructions_dir, rules_dir=rules_dir, output_format=output_format, cwd=cwd, env=env)
 
 
 def rm_skill(
@@ -960,11 +1545,16 @@ def rm_skill(
     *,
     delete: bool = False,
     no_sync: bool = False,
+    directory: str | None = None,
+    manifest: str | None = None,
+    instructions_dir: str | None = None,
+    rules_dir: str | None = None,
+    output_format: str | None = None,
     cwd: str | os.PathLike[str] | None = None,
     env: Mapping[str, str] | None = None,
 ) -> outcomes.MutationOutput:
     """Remove a skill from the manifest"""
-    return _get_theta().rm.skill(name, delete=delete, no_sync=no_sync, cwd=cwd, env=env)
+    return _get_theta().rm.skill(name, delete=delete, no_sync=no_sync, directory=directory, manifest=manifest, instructions_dir=instructions_dir, rules_dir=rules_dir, output_format=output_format, cwd=cwd, env=env)
 
 
 def rm_subagent(
@@ -972,19 +1562,30 @@ def rm_subagent(
     *,
     delete: bool = False,
     no_sync: bool = False,
+    directory: str | None = None,
+    manifest: str | None = None,
+    instructions_dir: str | None = None,
+    rules_dir: str | None = None,
+    output_format: str | None = None,
     cwd: str | os.PathLike[str] | None = None,
     env: Mapping[str, str] | None = None,
 ) -> outcomes.MutationOutput:
     """Remove a subagent from the manifest"""
-    return _get_theta().rm.subagent(name, delete=delete, no_sync=no_sync, cwd=cwd, env=env)
+    return _get_theta().rm.subagent(name, delete=delete, no_sync=no_sync, directory=directory, manifest=manifest, instructions_dir=instructions_dir, rules_dir=rules_dir, output_format=output_format, cwd=cwd, env=env)
 
 
 def rm_store(
     kind: str,
     name: str,
+    *,
+    directory: str | None = None,
+    manifest: str | None = None,
+    instructions_dir: str | None = None,
+    rules_dir: str | None = None,
+    output_format: str | None = None,
     cwd: str | os.PathLike[str] | None = None,
     env: Mapping[str, str] | None = None,
 ) -> outcomes.MutationOutput:
     """Unregister a resource from the system store"""
-    return _get_theta().rm.store(kind, name, cwd=cwd, env=env)
+    return _get_theta().rm.store(kind, name, directory=directory, manifest=manifest, instructions_dir=instructions_dir, rules_dir=rules_dir, output_format=output_format, cwd=cwd, env=env)
 

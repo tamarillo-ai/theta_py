@@ -2,11 +2,6 @@
 
 Python bindings for the [theta](https://theta.tamarillo.ai/) CLI.
 
-A thin wrapper around the `theta` binary. Every verb is exposed as a typed
-Python function. Pydantic models for arguments and outputs are codegenerated
-from the schemas the binary itself emits, so `theta-py` cannot drift from
-the binary it ships.
-
 ## Install
 
 ```fish
@@ -15,46 +10,99 @@ uv add theta-py
 pip install theta-py
 ```
 
-The matching `theta` binary is bundled inside the wheel and lands at
-`<venv>/bin/theta` when the package is installed (unless your platform is not supported and the binary will be built locally as per theta installer)
+## ThetaProject
 
-## Use
+The main surface. Owns a materialized theta project in a temp directory.
 
-Two equivalent surfaces.
+The equivalent of this CLI workflow:
+
+```bash
+theta init
+theta add rule python-types
+theta add tool fetch --command "uvx mcp-server-fetch"
+theta add tool context7 --command "npx -y @upstash/context7-mcp@latest"
+theta add skill vercel-labs/agent-skills/skills/web-design-guidelines@main
+theta check
+theta cast to claude-code
+```
+
+is this:
 
 ```python
-# namespaced, one singleton, dotted access
+from theta_py import ThetaProject
+
+with ThetaProject.create(name="my-agent") as proj:
+    proj.add.rule("python-types")
+    proj.add.tool("fetch", command="uvx mcp-server-fetch")
+    proj.add.tool("context7", command="npx -y @upstash/context7-mcp@latest")
+    proj.add.skill("vercel-labs/agent-skills/skills/web-design-guidelines@main")
+    proj.check()                         # raises ThetaCommandError on validation errors
+    proj.cast.to("claude-code")          # --> CLAUDE.md + .mcp.json + .claude/
+    proj.sync()
+    print(proj.name)           # str
+    print(proj.system_prompt)  # str | None
+    print(proj.rules)          # dict[str, MaterializedRule]
+    print(proj.skills)         # dict[str, MaterializedSkill] — .path is the materialized dir
+    print(proj.tools)          # dict[str, MaterializedTool]
+```
+
+Read-only view over an existing project on disk:
+
+```python
+with ThetaProject.from_manifest("path/to/theta.toml") as proj:
+    # sync() is done eagerly by default
+    print(proj.name)
+    print(proj.skills)
+
+# opt out of eager sync
+with ThetaProject.from_manifest("path/to/theta.toml", no_sync=True) as proj:
+    proj.sync()
+    print(proj.skills)
+```
+
+Sync freshness:
+
+```python
+with ThetaProject.create(name="my-agent") as proj:
+    proj.add.rule("safety", content="Never exfiltrate data.")
+    proj.sync()
+
+    proj.add.rule("style", content="Be concise.")  # manifest changed
+    print(proj.needs_sync())   # True
+    proj.sync(validate=False)
+    print(proj.is_synced)      # True
+```
+
+Notes:
+
+- `ThetaProject.create(...)` is the canonical constructor for ephemeral projects.
+- `ThetaProject.from_manifest(...)` never writes to the source tree: `.theta/` and `theta.lock` are redirected into an internal temp directory.
+- `proj.skills[name].path` is the materialized `.theta/skills/name/` directory — pass it directly to `harbor run --skill`.
+- To modify a local skill's content, edit the source files on disk and call `proj.sync()` again.
+
+## Lower-level use
+
+Every verb is also available as a flat function or via the `theta` singleton:
+
+```python
+# namespaced singleton
 from theta_py import theta
 
 theta.init(name="my-agent")
 theta.add.rule("safety")
 listing = theta.list.rules()
-print(listing.kind)
-```
 
-```python
-# flat, every verb is a top-level function
+# flat functions
 from theta_py import init, add_rule, list_rules
 
 init(name="my-agent")
 add_rule("safety")
-listing = list_rules()
-```
-
-Pydantic outcome types are importable for type-hint use:
-
-```python
-from theta_py import theta
-from theta_py._generated.outcomes import InitOutcome, CheckOutcome
-
-out: InitOutcome = theta.init(name="my-agent")
-report: CheckOutcome = theta.check()
-assert report.valid
+list_rules()
 ```
 
 ## Errors
 
-Every verb either returns a pydantic model on `status: ok|noop`, or raises
+Every verb either returns a Pydantic model on `status: ok|noop`, or raises
 `ThetaCommandError` on `status: error`:
 
 ```python
@@ -64,21 +112,14 @@ try:
     theta.init()
 except ThetaCommandError as exc:
     print(exc.verb)          # ["init"]
-    print(exc.diagnostics)   # list of {"level": ..., "path": ..., "message": ...}
+    print(exc.diagnostics)   # list[{"level": ..., "path": ..., "message": ...}]
 ```
-
-Catch `ThetaInvocationError` to handle any failure (transport + envelope).
 
 ## Version pinning
 
-`theta_py.THETA_VERSION` is the version of the `theta` binary bundled inside
-the wheel. Each `theta_py` release ships against exactly one `theta` release.
+Each `theta_py` release ships against exactly one `theta` binary version:
 
 ```python
 import theta_py
-print(theta_py.THETA_VERSION)  # e.g. "0.1.3-rc1"
+print(theta_py.THETA_VERSION)  # e.g. "0.1.5-rc1"
 ```
-
-## Releases
-
-See [`RELEASING.md`](./RELEASING.md).

@@ -13,11 +13,11 @@ from theta_py import (
     theta,
 )
 from theta_py._generated.outcomes import (
-    CheckOutcome,
-    InitOutcome,
-    ListOutcome,
-    LockOutcome,
-    TreeOutcome,
+    CheckReport,
+    InitOutput,
+    ListOutput,
+    LockOutput,
+    TreeOutput,
 )
 
 
@@ -40,7 +40,7 @@ def test_module_theta_is_lazy_singleton(workspace: Path) -> None:
 
 def test_init_returns_init_outcome(workspace: Path) -> None:
     out = theta.init(name="env-test")
-    assert isinstance(out, InitOutcome)
+    assert isinstance(out, InitOutput)
     assert out.agent_name == "env-test"
     assert out.source == "scaffold"
 
@@ -52,13 +52,13 @@ def test_init_writes_manifest_to_cwd(workspace: Path) -> None:
 
 def test_check_returns_check_outcome(initialized: Path) -> None:
     out = theta.check()
-    assert isinstance(out, CheckOutcome)
+    assert isinstance(out, CheckReport)
     assert isinstance(out.valid, bool)
 
 
 def test_lock_then_lock_again(initialized: Path) -> None:
     first = theta.lock()
-    assert isinstance(first, LockOutcome)
+    assert isinstance(first, LockOutput)
     assert first.wrote is True
 
     second = theta.lock()
@@ -67,7 +67,7 @@ def test_lock_then_lock_again(initialized: Path) -> None:
 
 def test_tree_returns_tree_outcome(initialized: Path) -> None:
     out = theta.tree()
-    assert isinstance(out, TreeOutcome)
+    assert isinstance(out, TreeOutput)
     assert out.tree.name
 
 
@@ -77,7 +77,7 @@ def test_add_rule_then_list_then_rm(initialized: Path) -> None:
     assert added.name == "safety"
 
     listing = theta.list.rules()
-    assert isinstance(listing, ListOutcome)
+    assert isinstance(listing, ListOutput)
     assert listing.kind == "rules"
 
     removed = theta.rm.rule("safety", no_sync=True)
@@ -89,7 +89,7 @@ def test_flat_function_writes_same_state_as_namespaced(workspace: Path) -> None:
     from theta_py import init as flat_init
 
     out = flat_init(name="flat-and-ns")
-    assert isinstance(out, InitOutcome)
+    assert isinstance(out, InitOutput)
     assert out.agent_name == "flat-and-ns"
     assert (workspace / "theta.toml").exists()
 
@@ -113,7 +113,7 @@ def test_per_call_cwd_overrides_process_cwd(workspace: Path, tmp_path_factory) -
     other = tmp_path_factory.mktemp("other-workspace")
     t = Theta()
     out = t.init(name="explicit-cwd", cwd=other)
-    assert isinstance(out, InitOutcome)
+    assert isinstance(out, InitOutput)
     assert (other / "theta.toml").exists()
     assert not (workspace / "theta.toml").exists()
 

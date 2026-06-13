@@ -9,7 +9,7 @@ from __future__ import annotations
 from enum import StrEnum
 from typing import Any
 
-from pydantic import BaseModel, conint
+from pydantic import BaseModel, Field, conint
 
 
 class ThetaOutcomes(BaseModel):
@@ -21,14 +21,14 @@ class InitSource(StrEnum):
     store = 'store'
 
 
-class InitOutcome(BaseModel):
+class InitOutput(BaseModel):
     agent_name: str | None = None
     gitignore_appended: bool
     manifest_path: str
     source: InitSource
 
 
-class CheckOutcome(BaseModel):
+class CheckReport(BaseModel):
     errors: conint(ge=0)
     hints: conint(ge=0)
     valid: bool
@@ -47,7 +47,7 @@ class DescribeRule(BaseModel):
     summary: str | None = None
 
 
-class DescribeOutcome(BaseModel):
+class DescribeOutput(BaseModel):
     description: str | None = None
     mode: DescribeMode
     rules: list[DescribeRule] | None = None
@@ -91,29 +91,29 @@ class ListKind(StrEnum):
     store = 'store'
 
 
-class ListOutcome(BaseModel):
+class ListOutput(BaseModel):
     entries: Any
     kind: ListKind
 
 
-class LockOutcome(BaseModel):
+class LockOutput(BaseModel):
     lockfile_path: str
     wrote: bool
 
 
-class SyncOutcome(BaseModel):
+class SyncOutput(BaseModel):
     created: conint(ge=0)
     theta_dir: str
     updated: conint(ge=0)
 
 
-class CastToOutcome(BaseModel):
+class CastToOutput(BaseModel):
     files_written: list[str]
     output_dir: str
     target: str
 
 
-class CastFromOutcome(BaseModel):
+class CastFromOutput(BaseModel):
     files_written: list[str]
     manifest_path: str
     source: str
@@ -126,8 +126,67 @@ class TreeNode(BaseModel):
     name: str
 
 
-class TreeOutcome(BaseModel):
+class TreeOutput(BaseModel):
     tree: TreeNode
+
+
+class AgentInfo(BaseModel):
+    """
+    Agent identity from `theta.toml [agent]`.
+    """
+    authors: list[str] | None = None
+    description: str
+    model: str | None = None
+    name: str
+    tags: list[str] | None = None
+    version: str | None = None
+
+
+class MaterializedRule(BaseModel):
+    """
+    A single materialized rule — content plus the metadata from `theta.toml`.
+    """
+    apply: str = Field(..., description='Application mode declared in `theta.toml`.')
+    apply_to: list[str] | None = Field(None, description='Glob patterns for `apply: glob` rules.')
+    content: str = Field(..., description='Full text content of the rule.')
+    description: str | None = Field(None, description='Description from `theta.toml` (used for `apply: model-decision`).')
+    summary: str | None = Field(None, description='Human-readable summary from `theta.toml`.')
+
+
+class MaterializedSkill(BaseModel):
+    """
+    A single materialized skill — body plus frontmatter, plus the `tags` and `goal` declared in `theta.toml`, plus all non-SKILL.md supporting files.
+    """
+    description: str | None = Field(None, description='`description` from SKILL.md frontmatter.')
+    goal: str | None = Field(None, description='`goal` from `theta.toml [skills.<name>]`.')
+    name: str = Field(..., description='`name` from SKILL.md frontmatter.')
+    path: str = Field(..., description='Path to the skill directory inside `.theta/skills/`. Pass directly to `harbor run --skill`.')
+    skill_md: str = Field(..., description='Full text of SKILL.md (including frontmatter).')
+    supporting_files: dict[str, str] = Field(..., description='All other files in the skill directory (relative path → content). Only UTF-8 readable files are included; binary files are skipped.')
+    tags: list[str] | None = Field(None, description='`tags` from `theta.toml [skills.<name>]`.')
+
+
+class MaterializedTool(BaseModel):
+    """
+    A single MCP tool config from `theta.toml [tools]`.
+    """
+    args: list[str] | None = None
+    command: list[str] | None = None
+    enabled: bool
+    env: dict[str, Any] | None = None
+    url: str | None = None
+
+
+class ProjectSnapshot(BaseModel):
+    """
+    The full materialized state of a theta project.
+    """
+    agent: AgentInfo = Field(..., description='Agent identity fields from `theta.toml [agent]`.')
+    lock_hash: str | None = Field(None, description='Canonical hash of the `theta.toml` that produced the current lock. `null` when `theta.lock` does not exist (project not yet locked).')
+    rules: dict[str, MaterializedRule] = Field(..., description='Materialized rules, keyed by rule name.')
+    skills: dict[str, MaterializedSkill] = Field(..., description='Materialized skills, keyed by skill name.')
+    system_prompt: str | None = Field(None, description='Rendered system prompt from `.theta/system.md`. `null` when no system prompt is configured.')
+    tools: dict[str, MaterializedTool] = Field(..., description='MCP tool configs from `theta.toml [tools]`.')
 
 
 class MutationSource(BaseModel):
