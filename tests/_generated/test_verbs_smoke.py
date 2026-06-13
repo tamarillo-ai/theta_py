@@ -61,39 +61,39 @@ def test_smoke_init_namespaced(workspace: Path) -> None:
     t = Theta()
     SETUP['none'](t)
     out = t.init(name='smoke')
-    assert isinstance(out, outcomes.InitOutcome)
+    assert isinstance(out, outcomes.InitOutput)
 
 
 def test_smoke_init_flat(workspace: Path) -> None:
     SETUP['none'](Theta())
     out = verbs.init(name='smoke')
-    assert isinstance(out, outcomes.InitOutcome)
+    assert isinstance(out, outcomes.InitOutput)
 
 
 def test_smoke_check_namespaced(workspace: Path) -> None:
     t = Theta()
     SETUP['init'](t)
     out = t.check()
-    assert isinstance(out, outcomes.CheckOutcome)
+    assert isinstance(out, outcomes.CheckReport)
 
 
 def test_smoke_check_flat(workspace: Path) -> None:
     SETUP['init'](Theta())
     out = verbs.check()
-    assert isinstance(out, outcomes.CheckOutcome)
+    assert isinstance(out, outcomes.CheckReport)
 
 
 def test_smoke_describe_namespaced(workspace: Path) -> None:
     t = Theta()
     SETUP['init'](t)
     out = t.describe()
-    assert isinstance(out, outcomes.DescribeOutcome)
+    assert isinstance(out, outcomes.DescribeOutput)
 
 
 def test_smoke_describe_flat(workspace: Path) -> None:
     SETUP['init'](Theta())
     out = verbs.describe()
-    assert isinstance(out, outcomes.DescribeOutcome)
+    assert isinstance(out, outcomes.DescribeOutput)
 
 
 def test_smoke_add_rule_namespaced(workspace: Path) -> None:
@@ -253,104 +253,104 @@ def test_smoke_list_rules_namespaced(workspace: Path) -> None:
     t = Theta()
     SETUP['init'](t)
     out = t.list.rules()
-    assert isinstance(out, outcomes.ListOutcome)
+    assert isinstance(out, outcomes.ListOutput)
 
 
 def test_smoke_list_rules_flat(workspace: Path) -> None:
     SETUP['init'](Theta())
     out = verbs.list_rules()
-    assert isinstance(out, outcomes.ListOutcome)
+    assert isinstance(out, outcomes.ListOutput)
 
 
 def test_smoke_list_tools_namespaced(workspace: Path) -> None:
     t = Theta()
     SETUP['init'](t)
     out = t.list.tools()
-    assert isinstance(out, outcomes.ListOutcome)
+    assert isinstance(out, outcomes.ListOutput)
 
 
 def test_smoke_list_tools_flat(workspace: Path) -> None:
     SETUP['init'](Theta())
     out = verbs.list_tools()
-    assert isinstance(out, outcomes.ListOutcome)
+    assert isinstance(out, outcomes.ListOutput)
 
 
 def test_smoke_list_skills_namespaced(workspace: Path) -> None:
     t = Theta()
     SETUP['init'](t)
     out = t.list.skills()
-    assert isinstance(out, outcomes.ListOutcome)
+    assert isinstance(out, outcomes.ListOutput)
 
 
 def test_smoke_list_skills_flat(workspace: Path) -> None:
     SETUP['init'](Theta())
     out = verbs.list_skills()
-    assert isinstance(out, outcomes.ListOutcome)
+    assert isinstance(out, outcomes.ListOutput)
 
 
 def test_smoke_list_subagents_namespaced(workspace: Path) -> None:
     t = Theta()
     SETUP['init'](t)
     out = t.list.subagents()
-    assert isinstance(out, outcomes.ListOutcome)
+    assert isinstance(out, outcomes.ListOutput)
 
 
 def test_smoke_list_subagents_flat(workspace: Path) -> None:
     SETUP['init'](Theta())
     out = verbs.list_subagents()
-    assert isinstance(out, outcomes.ListOutcome)
+    assert isinstance(out, outcomes.ListOutput)
 
 
 def test_smoke_list_store_namespaced(workspace: Path) -> None:
     t = Theta()
     SETUP['init'](t)
     out = t.list.store()
-    assert isinstance(out, outcomes.ListOutcome)
+    assert isinstance(out, outcomes.ListOutput)
 
 
 def test_smoke_list_store_flat(workspace: Path) -> None:
     SETUP['init'](Theta())
     out = verbs.list_store()
-    assert isinstance(out, outcomes.ListOutcome)
+    assert isinstance(out, outcomes.ListOutput)
 
 
 def test_smoke_lock_namespaced(workspace: Path) -> None:
     t = Theta()
     SETUP['init'](t)
     out = t.lock()
-    assert isinstance(out, outcomes.LockOutcome)
+    assert isinstance(out, outcomes.LockOutput)
 
 
 def test_smoke_lock_flat(workspace: Path) -> None:
     SETUP['init'](Theta())
     out = verbs.lock()
-    assert isinstance(out, outcomes.LockOutcome)
+    assert isinstance(out, outcomes.LockOutput)
 
 
 def test_smoke_sync_namespaced(workspace: Path) -> None:
     t = Theta()
     SETUP['init'](t)
     out = t.sync()
-    assert isinstance(out, outcomes.SyncOutcome)
+    assert isinstance(out, outcomes.SyncOutput)
 
 
 def test_smoke_sync_flat(workspace: Path) -> None:
     SETUP['init'](Theta())
     out = verbs.sync()
-    assert isinstance(out, outcomes.SyncOutcome)
+    assert isinstance(out, outcomes.SyncOutput)
 
 
 def test_smoke_cast_to_namespaced(workspace: Path) -> None:
     t = Theta()
     SETUP['init'](t)
     out = t.cast.to(target='claude-code')
-    assert isinstance(out, outcomes.CastToOutcome)
+    assert isinstance(out, outcomes.CastToOutput)
 
 
 def test_smoke_cast_to_flat(workspace: Path) -> None:
     SETUP['init'](Theta())
     out = verbs.cast_to(target='claude-code')
-    assert isinstance(out, outcomes.CastToOutcome)
+    assert isinstance(out, outcomes.CastToOutput)
 
 
 @pytest.mark.skip(reason='requires a populated source directory; covered by Rust cast_round_trip tests')
@@ -358,14 +358,14 @@ def test_smoke_cast_from_namespaced(workspace: Path) -> None:
     t = Theta()
     SETUP['none'](t)
     out = t.cast.from_(source='claude-code')
-    assert isinstance(out, outcomes.CastFromOutcome)
+    assert isinstance(out, outcomes.CastFromOutput)
 
 
 @pytest.mark.skip(reason='requires a populated source directory; covered by Rust cast_round_trip tests')
 def test_smoke_cast_from_flat(workspace: Path) -> None:
     SETUP['none'](Theta())
     out = verbs.cast_from(source='claude-code')
-    assert isinstance(out, outcomes.CastFromOutcome)
+    assert isinstance(out, outcomes.CastFromOutput)
 
 
 @pytest.mark.skip(reason='requires a populated system store')
@@ -417,13 +417,13 @@ def test_smoke_tree_namespaced(workspace: Path) -> None:
     t = Theta()
     SETUP['init'](t)
     out = t.tree()
-    assert isinstance(out, outcomes.TreeOutcome)
+    assert isinstance(out, outcomes.TreeOutput)
 
 
 def test_smoke_tree_flat(workspace: Path) -> None:
     SETUP['init'](Theta())
     out = verbs.tree()
-    assert isinstance(out, outcomes.TreeOutcome)
+    assert isinstance(out, outcomes.TreeOutput)
 
 
 @pytest.mark.skip(reason='schema verb dumps full TOML schema, not envelope-shaped')
@@ -451,6 +451,7 @@ KNOWN_LEAVES: tuple[tuple[str, ...], ...] = (
     ('cast', 'to'),
     ('check',),
     ('describe',),
+    ('get',),
     ('init',),
     ('list', 'rules'),
     ('list', 'skills'),
